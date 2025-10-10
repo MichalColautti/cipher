@@ -1,5 +1,9 @@
+import { useAuth } from "@/contexts/authContext";
+import { isUsernameTaken } from "@/services/userService";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+    Alert,
     StyleSheet,
     Text,
     TextInput,
@@ -15,9 +19,54 @@ const AuthScreen = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [error, setError] = useState("");
+  const { login, register } = useAuth();
+
+  const router = useRouter();
+
+  const handleAuth = async () => {
+    if (!email.trim() || !password.trim()) {
+      setError("Email and password are required");
+      Alert.alert("Error", "Email and password are required");
+      return;
+    }
+
+    let response;
+
+    if (isRegistering) {
+      if(await isUsernameTaken(username)){
+        setError("Username is already taken");
+        Alert.alert("Error", "Username is already taken");
+        return;
+      }
+      if (!username.trim()) {
+        setError("Username is required");
+        Alert.alert("Error", "Username is required");
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError("Passwords do not match");
+        Alert.alert("Error", "Passwords do not match");
+        return;
+      }
+
+      response = await register(username, email, password);
+    } else {
+      response = await login(email, password);
+    }
+
+    if (response.error) {
+      setError(response.error);
+      Alert.alert("Error", response.error);
+    } else {
+      router.replace("/");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
         {isRegistering ? (
           <View style={styles.form}>
             <TextInput
@@ -83,7 +132,7 @@ const AuthScreen = () => {
       </View>
 
       <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleAuth}>
           <Text style={styles.buttonText}>
             {isRegistering ? "Register" : "Login"}
           </Text>
@@ -142,6 +191,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 15,
     marginBottom: 15,
+  },
+  error: {
+    color: "red",
+    textAlign: "center",
+    marginBottom: 10,
   },
 });
 
