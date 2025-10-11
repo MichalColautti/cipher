@@ -1,7 +1,13 @@
 import { auth, db } from "@/config/firebaseConfig";
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
+import { getUserById } from "../services/userService";
 
 const AuthContext = createContext();
 
@@ -10,40 +16,45 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log("Got user:", user);
-      setUser(user || null);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const profile = await getUserById(user.uid);
+        console.log("Got user:", profile.username, profile.email);
+        setUser(profile || null);
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
-  const login = async (email,password) => {
+  const login = async (email, password) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
     } catch (error) {
-      return {error: error.message};
+      return { error: error.message };
     }
-  }
+  };
 
   const register = async (username, email, password) => {
     try {
-      await createUserWithEmailAndPassword(auth,email,password)
+      await createUserWithEmailAndPassword(auth, email, password);
 
       const user = auth.currentUser;
-    if (!user) throw new Error("User not found after registration");
+      if (!user) throw new Error("User not found after registration");
 
-    await setDoc(doc(db, "users", user.uid), {
-      username: username,
-      email: email,
-    });
+      await setDoc(doc(db, "users", user.uid), {
+        username: username,
+        email: email,
+      });
 
       return login(email, password);
     } catch (error) {
-      return {error: error.message}
+      return { error: error.message };
     }
-  }
+  };
 
   const logout = async () => {
     try {
@@ -51,9 +62,9 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       return { success: true };
     } catch (error) {
-      return {error: error.message};
+      return { error: error.message };
     }
-  }
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, register, login, logout }}>

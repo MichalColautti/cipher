@@ -1,14 +1,14 @@
 import { useAuth } from "@/contexts/authContext";
 import { isUsernameTaken } from "@/services/userService";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-    Alert,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const AuthScreen = () => {
@@ -20,9 +20,15 @@ const AuthScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [error, setError] = useState("");
-  const { login, register } = useAuth();
+  const { login, register, user, loading } = useAuth();
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/"); 
+    }
+  }, [user, loading, router]);
 
   const handleAuth = async () => {
     if (!email.trim() || !password.trim()) {
@@ -58,9 +64,8 @@ const AuthScreen = () => {
     if (response.error) {
       setError(response.error);
       Alert.alert("Error", response.error);
-    } else {
-      router.replace("/");
-    }
+      return;
+    } 
   };
 
   return (
