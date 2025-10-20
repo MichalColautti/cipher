@@ -1,8 +1,10 @@
+import ChatItem from "@/components/chatItem";
 import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import {
   ActivityIndicator,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -40,13 +42,41 @@ const HomeScreen = () => {
 
           {/* search bar */}
           <View style={styles.searchContainer}>
-            <SearchIcon width={20} height={20} color={"#fff"} style={styles.searchIcon} />
+            <SearchIcon
+              width={20}
+              height={20}
+              color={"#fff"}
+              style={styles.searchIcon}
+            />
             <TextInput
-              placeholder="Search" 
+              placeholder="Search"
               placeholderTextColor={"#F9F6F0"}
               style={styles.searchBar}
             />
           </View>
+
+          {/* chat list */}
+          <ScrollView>
+            <Text style={styles.subtitle}>Pinned</Text>
+            <ChatItem
+              name="Tom Black"
+              message="Where I can't find you"
+              time="4 min"
+            />
+            <ChatItem
+              name="Julie 🤍"
+              message="I'll be back at 5"
+              time="47 min"
+            />
+            <Text style={styles.subtitle}>Chats</Text>
+            <ChatItem name="Sheldon" message="Thanks mate." time="2 day" />
+            <ChatItem name="Dad" message="👍" time="3 day" />
+            <ChatItem
+              name="James Leaf"
+              message="The deadline for the project is now on Friday instead of next Monday, please confirm."
+              time="5 day"
+            />
+          </ScrollView>
         </View>
       ) : null}
     </View>
@@ -61,6 +91,7 @@ const styles = StyleSheet.create({
   },
   chatScreen: {
     marginHorizontal: 10,
+    flex: 1,
   },
   header: {
     alignItems: "center",
@@ -91,6 +122,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 20,
     borderRadius: 16,
+    marginBottom: 20,
   },
   searchBar: {
     marginLeft: 10,
@@ -98,6 +130,12 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     opacity: 0.5,
+  },
+  subtitle: {
+    color: "#fff",
+    fontSize: 20,
+    marginBottom: 20,
+    fontWeight: "600",
   },
 });
 

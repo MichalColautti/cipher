@@ -1,14 +1,18 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const chatItem = () => (
-  <View style={styles.container}>
+const chatItem = ({
+    name,
+    message,
+    time,
+}) => (
+  <TouchableOpacity style={styles.container}>
     <View style={styles.profileImg} />
     <View style={styles.chatText}>
-      <Text style={styles.chatName}>Name</Text>
-      <Text style={styles.chatMessage} numberOfLines={2} ellipsizeMode="tail">test message: hello Michael this is me Andrew. How are you doing?</Text>
+      <Text style={styles.chatName}>{name}</Text>
+      <Text style={styles.chatMessage} numberOfLines={2} ellipsizeMode="tail">{message}</Text>
     </View>
-    <Text style={styles.chatTime}>17:20</Text>
-  </View>
+    <Text style={styles.chatTime}>{time}</Text>
+  </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
