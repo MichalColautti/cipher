@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import AddChatIcon from "../assets/icons/addChat.svg";
 import SearchIcon from "../assets/icons/search.svg";
 
 const HomeScreen = () => {
@@ -36,7 +35,7 @@ const HomeScreen = () => {
             <View style={styles.profileImg} />
             <Text style={styles.title}>Cipher</Text>
             <TouchableOpacity style={styles.addButton}>
-              <AddChatIcon width={40} height={40} stroke={"#fff"} />
+              <BackIcon width={40} height={40} stroke={"#fff"} />
             </TouchableOpacity>
           </View>
 
@@ -62,19 +61,22 @@ const HomeScreen = () => {
               name="Tom Black"
               message="Where I can't find you"
               time="4 min"
+              targetScreen="/chat"
             />
             <ChatItem
               name="Julie 🤍"
               message="I'll be back at 5"
               time="47 min"
+              targetScreen="/chat"
             />
             <Text style={styles.subtitle}>Chats</Text>
-            <ChatItem name="Sheldon" message="Thanks mate." time="2 day" />
-            <ChatItem name="Dad" message="👍" time="3 day" />
+            <ChatItem name="Sheldon" message="Thanks mate." time="2 day" targetScreen="/chat" />
+            <ChatItem name="Dad" message="👍" time="3 day" targetScreen="/chat" />
             <ChatItem
               name="James Leaf"
               message="The deadline for the project is now on Friday instead of next Monday, please confirm."
               time="5 day"
+              targetScreen="/chat"
             />
           </ScrollView>
         </View>

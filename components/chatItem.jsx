@@ -1,24 +1,33 @@
+import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const chatItem = ({
-    name,
-    message,
-    time,
-}) => (
-  <TouchableOpacity style={styles.container}>
-    <View style={styles.profileImg} />
-    <View style={styles.chatText}>
-      <Text style={styles.chatName}>{name}</Text>
-      <Text style={styles.chatMessage} numberOfLines={2} ellipsizeMode="tail">{message}</Text>
-    </View>
-    <Text style={styles.chatTime}>{time}</Text>
-  </TouchableOpacity>
-);
+const ChatItem = ({ name, message, time, targetScreen }) => {
+  const router = useRouter();
+
+  const handlePress = () => {
+    if (targetScreen) {
+      router.push(targetScreen);
+    }
+  };
+
+  return (
+    <TouchableOpacity style={styles.container} onPress={handlePress} activeOpacity={0.7}>
+      <View style={styles.profileImg} />
+      <View style={styles.chatText}>
+        <Text style={styles.chatName}>{name}</Text>
+        <Text style={styles.chatMessage} numberOfLines={2} ellipsizeMode="tail">
+          {message}
+        </Text>
+      </View>
+      <Text style={styles.chatTime}>{time}</Text>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    alignItems: "start",
+    alignItems: "flex-start",
     marginBottom: 18,
   },
   profileImg: {
@@ -52,4 +61,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default chatItem;
+export default ChatItem;
