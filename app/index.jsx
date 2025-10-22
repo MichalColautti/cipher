@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import AddChatIcon from "../assets/icons/addChat.svg";
 import SearchIcon from "../assets/icons/search.svg";
 
 const HomeScreen = () => {
@@ -35,7 +36,7 @@ const HomeScreen = () => {
             <View style={styles.profileImg} />
             <Text style={styles.title}>Cipher</Text>
             <TouchableOpacity style={styles.addButton}>
-              <BackIcon width={40} height={40} stroke={"#fff"} />
+              <AddChatIcon width={40} height={40} stroke={"#fff"} />
             </TouchableOpacity>
           </View>
 
