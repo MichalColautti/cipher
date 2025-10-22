@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 5,
     borderBottomRightRadius: 5,
     borderBottomLeftRadius: 5,
+    marginTop: 20,
   },
   rightShapeNext: {
     borderRadius: 5,
@@ -142,6 +143,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 5,
     borderBottomRightRadius: 5,
     borderBottomLeftRadius: 5,
+    marginTop: 20,
   },
   leftShapeNext: {
     borderRadius: 5,
