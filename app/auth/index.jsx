@@ -1,3 +1,4 @@
+import Logo from "@/assets/icons/logo.svg";
 import { useAuth } from "@/contexts/authContext";
 import { isUsernameTaken } from "@/services/userService";
 import { useRouter } from "expo-router";
@@ -71,6 +72,9 @@ const AuthScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
+        <View style={styles.logo}>
+          <Logo width={100} height={100}/>
+        </View>
         {error ? <Text style={styles.error}>{error}</Text> : null}
         {isRegistering ? (
           <View style={styles.form}>
@@ -201,6 +205,10 @@ const styles = StyleSheet.create({
     color: "red",
     textAlign: "center",
     marginBottom: 10,
+  },
+  logo: {
+    alignItems: "center",
+    marginBottom: 30, 
   },
 });
 
