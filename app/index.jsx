@@ -33,7 +33,13 @@ const HomeScreen = () => {
         <View style={styles.chatScreen}>
           {/* header */}
           <View style={styles.header}>
-            <View style={styles.profileImg} />
+            <TouchableOpacity
+              onPress={() => {
+                router.replace("/profile");
+              }}
+            >
+              <View style={styles.profileImg} />
+            </TouchableOpacity>
             <Text style={styles.title}>Cipher</Text>
             <TouchableOpacity style={styles.addButton}>
               <AddChatIcon width={40} height={40} stroke={"#fff"} />
@@ -71,8 +77,18 @@ const HomeScreen = () => {
               targetScreen="/chat"
             />
             <Text style={styles.subtitle}>Chats</Text>
-            <ChatItem name="Sheldon" message="Thanks mate." time="2 day" targetScreen="/chat" />
-            <ChatItem name="Dad" message="👍" time="3 day" targetScreen="/chat" />
+            <ChatItem
+              name="Sheldon"
+              message="Thanks mate."
+              time="2 day"
+              targetScreen="/chat"
+            />
+            <ChatItem
+              name="Dad"
+              message="👍"
+              time="3 day"
+              targetScreen="/chat"
+            />
             <ChatItem
               name="James Leaf"
               message="The deadline for the project is now on Friday instead of next Monday, please confirm."
