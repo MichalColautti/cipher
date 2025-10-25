@@ -1,5 +1,13 @@
+import AboutIcon from "@/assets/icons/about.svg";
+import AccountIcon from "@/assets/icons/account.svg";
+import AppearanceIcon from "@/assets/icons/appearance.svg";
 import BackIcon from "@/assets/icons/back.svg";
+import DataIcon from "@/assets/icons/data.svg";
 import ForwardIcon from "@/assets/icons/forward.svg";
+import HelptIcon from "@/assets/icons/help.svg";
+import LinkedDevicesIcon from "@/assets/icons/linkedDevices.svg";
+import NotificationsIcon from "@/assets/icons/notifications.svg";
+import PrivacyIcon from "@/assets/icons/privacy.svg";
 import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -29,6 +37,102 @@ const ProfileScreen = () => {
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>{user?.email}</Text>
               <Text style={styles.atText}>@{user?.username}</Text>
+            </View>
+          </View>
+          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.settingsContainer}>
+        <TouchableOpacity style={styles.settingBox}>
+          <View style={styles.leftOptionSection}>
+            <AccountIcon width={24} height={24} />
+            <View style={styles.textContainer}>
+              <Text style={styles.nameText}>Account</Text>
+            </View>
+          </View>
+          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+        </TouchableOpacity>
+
+        <View style={styles.divider} />
+
+        <TouchableOpacity style={styles.settingBox}>
+          <View style={styles.leftOptionSection}>
+            <LinkedDevicesIcon width={24} height={24} />
+            <View style={styles.textContainer}>
+              <Text style={styles.nameText}>Linked devices</Text>
+            </View>
+          </View>
+          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+        </TouchableOpacity>
+
+        <View style={styles.divider} />
+
+        <TouchableOpacity style={styles.settingBox}>
+          <View style={styles.leftOptionSection}>
+            <PrivacyIcon width={24} height={24} />
+            <View style={styles.textContainer}>
+              <Text style={styles.nameText}>Privacy</Text>
+            </View>
+          </View>
+          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.settingsContainer}>
+        <TouchableOpacity style={styles.settingBox}>
+          <View style={styles.leftOptionSection}>
+            <AppearanceIcon width={24} height={24} />
+            <View style={styles.textContainer}>
+              <Text style={styles.nameText}>Appearance</Text>
+            </View>
+          </View>
+          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+        </TouchableOpacity>
+
+        <View style={styles.divider} />
+
+        <TouchableOpacity style={styles.settingBox}>
+          <View style={styles.leftOptionSection}>
+            <NotificationsIcon width={24} height={24} />
+            <View style={styles.textContainer}>
+              <Text style={styles.nameText}>Notifications</Text>
+            </View>
+          </View>
+          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+        </TouchableOpacity>
+
+        <View style={styles.divider} />
+
+        <TouchableOpacity style={styles.settingBox}>
+          <View style={styles.leftOptionSection}>
+            <DataIcon width={24} height={24} />
+            <View style={styles.textContainer}>
+              <Text style={styles.nameText}>Data and Storage</Text>
+            </View>
+          </View>
+          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.settingsContainer}>
+        <TouchableOpacity style={styles.settingBox}>
+          <View style={styles.leftOptionSection}>
+            <HelptIcon width={24} height={24} />
+            <View style={styles.textContainer}>
+              <Text style={styles.nameText}>Help</Text>
+            </View>
+          </View>
+          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+        </TouchableOpacity>
+
+        <View style={styles.divider} />
+
+        <TouchableOpacity style={styles.settingBox}>
+          <View style={styles.leftOptionSection}>
+            <AboutIcon width={24} height={24} />
+            <View style={styles.textContainer}>
+              <Text style={styles.nameText}>About</Text>
             </View>
           </View>
           <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
@@ -66,10 +170,10 @@ const styles = StyleSheet.create({
   },
   settingsContainer: {
     marginTop: 22,
-  },
-  settingBox: {
     backgroundColor: "#383D42",
     borderRadius: 5,
+  },
+  settingBox: {
     padding: 15,
     flexDirection: "row",
     alignItems: "center",
@@ -97,6 +201,12 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     justifyContent: "center",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#F9F6F0",
+    opacity: 0.15,
+    marginLeft: 54,
   },
 });
 
