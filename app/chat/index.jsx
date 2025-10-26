@@ -3,15 +3,15 @@ import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AttachmentIcon from "../../assets/icons/attachment.svg";
@@ -151,6 +151,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1e1f21",
     color: "#fff",
     borderRadius: 20,
+    paddingVertical: 8,
 
   },
   button: {
