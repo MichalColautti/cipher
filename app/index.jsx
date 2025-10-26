@@ -35,7 +35,7 @@ const HomeScreen = () => {
           <View style={styles.header}>
             <TouchableOpacity
               onPress={() => {
-                router.replace("/profile");
+                router.push("/profile");
               }}
             >
               <View style={styles.profileImg} />

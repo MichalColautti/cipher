@@ -22,7 +22,7 @@ const ProfileScreen = () => {
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => {
-            router.replace("/");
+            router.back();
           }}
         >
           <BackIcon width={35} height={25} stroke={"#fff"} />
@@ -44,7 +44,7 @@ const ProfileScreen = () => {
       </View>
 
       <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingBox}>
+        <TouchableOpacity style={styles.settingBox} onPress={() => {router.push("/profile/account")}}>
           <View style={styles.leftOptionSection}>
             <AccountIcon width={24} height={24} />
             <View style={styles.textContainer}>
