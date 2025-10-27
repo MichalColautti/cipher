@@ -3,15 +3,15 @@ import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AttachmentIcon from "../../assets/icons/attachment.svg";
@@ -29,7 +29,12 @@ const ChatScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
         <ActivityIndicator size="large" color="#007bff" />
       </View>
     );
@@ -46,62 +51,135 @@ const ChatScreen = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#212427" }}>
-        <KeyboardAvoidingView
+      <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
-        >
+      >
         {/* Header */}
         <View style={styles.header}>
-            <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={() => router.back()}>
             <BackIcon width={35} height={25} fill={"#fff"} />
-            </TouchableOpacity>
-            <View style={styles.profileImg} />
-            <Text style={styles.title}>Tom Black</Text>
-            <TouchableOpacity style={styles.button}>
+          </TouchableOpacity>
+          <View style={styles.profileImg} />
+          <Text style={styles.title}>Tom Black</Text>
+          <TouchableOpacity style={styles.button}>
             <CallIcon width={28} height={28} fill={"#fff"} stroke={"#fff"} />
-            </TouchableOpacity>
+          </TouchableOpacity>
         </View>
 
         {/* Chat messages */}
         <ScrollView
-            style={styles.chatScreen}
-            contentContainerStyle={{ paddingBottom: 80 }}
+          style={styles.chatScreen}
+          contentContainerStyle={{ paddingBottom: 80 }}
         >
-            <MessageBubble text="Hey where are you?" time="11:40" isOwnMessage={false} />
-            <MessageBubble text="I am still waiting for you!" time="10:40" isOwnMessage={false} isFirstInGroup={false} />
-            <MessageBubble text="Hey I am here" time="10:41" isOwnMessage={true} isFirstInGroup={true} />
-            <MessageBubble text="Where are you, I can’t find you. Are you on the move right now?" time="10:45" isOwnMessage={true} isFirstInGroup={false} />
-            <MessageBubble image="https://placehold.co/182x289" time="10:45" isOwnMessage={false} isFirstInGroup={true} />
-            <MessageBubble text="Hey where are you?" time="11:40" isOwnMessage={false} />
-            <MessageBubble text="I am still waiting for you!" time="10:40" isOwnMessage={false} isFirstInGroup={false} />
-            <MessageBubble text="Hey I am here" time="10:41" isOwnMessage={true} isFirstInGroup={true} />
-            <MessageBubble text="Where are you, I can’t find you. Are you on the move right now?" time="10:45" isOwnMessage={true} isFirstInGroup={false} />
-            <MessageBubble image="https://placehold.co/182x289" time="10:45" isOwnMessage={false} isFirstInGroup={true} />
-            <MessageBubble text="Hey where are you?" time="11:40" isOwnMessage={false} isFirstInGroup={false}/>
-            <MessageBubble text="I am still waiting for you!" time="10:40" isOwnMessage={false} isFirstInGroup={false} />
-            <MessageBubble text="Hey I am here" time="10:41" isOwnMessage={true} isFirstInGroup={true} />
-            <MessageBubble text="Where are you, I can’t find you. Are you on the move right now?" time="10:45" isOwnMessage={true} isFirstInGroup={false} />
-            <MessageBubble image="https://placehold.co/182x289" time="10:45" isOwnMessage={false} isFirstInGroup={true} />
+          <MessageBubble
+            text="Hey where are you?"
+            time="11:40"
+            isOwnMessage={false}
+          />
+          <MessageBubble
+            text="I am still waiting for you!"
+            time="10:40"
+            isOwnMessage={false}
+            isFirstInGroup={false}
+          />
+          <MessageBubble
+            text="Hey I am here"
+            time="10:41"
+            isOwnMessage={true}
+            isFirstInGroup={true}
+          />
+          <MessageBubble
+            text="Where are you, I can’t find you. Are you on the move right now?"
+            time="10:45"
+            isOwnMessage={true}
+            isFirstInGroup={false}
+          />
+          <MessageBubble
+            image="https://placehold.co/182x289"
+            time="10:45"
+            isOwnMessage={false}
+            isFirstInGroup={true}
+          />
+          <MessageBubble
+            text="Hey where are you?"
+            time="11:40"
+            isOwnMessage={false}
+          />
+          <MessageBubble
+            text="I am still waiting for you!"
+            time="10:40"
+            isOwnMessage={false}
+            isFirstInGroup={false}
+          />
+          <MessageBubble
+            text="Hey I am here"
+            time="10:41"
+            isOwnMessage={true}
+            isFirstInGroup={true}
+          />
+          <MessageBubble
+            text="Where are you, I can’t find you. Are you on the move right now?"
+            time="10:45"
+            isOwnMessage={true}
+            isFirstInGroup={false}
+          />
+          <MessageBubble
+            image="https://placehold.co/182x289"
+            time="10:45"
+            isOwnMessage={false}
+            isFirstInGroup={true}
+          />
+          <MessageBubble
+            text="Hey where are you?"
+            time="11:40"
+            isOwnMessage={false}
+            isFirstInGroup={false}
+          />
+          <MessageBubble
+            text="I am still waiting for you!"
+            time="10:40"
+            isOwnMessage={false}
+            isFirstInGroup={false}
+          />
+          <MessageBubble
+            text="Hey I am here"
+            time="10:41"
+            isOwnMessage={true}
+            isFirstInGroup={true}
+          />
+          <MessageBubble
+            text="Where are you, I can’t find you. Are you on the move right now?"
+            time="10:45"
+            isOwnMessage={true}
+            isFirstInGroup={false}
+          />
+          <MessageBubble
+            image="https://placehold.co/182x289"
+            time="10:45"
+            isOwnMessage={false}
+            isFirstInGroup={true}
+          />
         </ScrollView>
 
         {/* Message input */}
         <View style={styles.inputContainer}>
-            <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button}>
             <AttachmentIcon width={22} height={22} fill="#fff" />
-            </TouchableOpacity>
-            <TextInput
+          </TouchableOpacity>
+          <TextInput
             style={styles.input}
             value={message}
             onChangeText={setMessage}
-            />
-            <TouchableOpacity onPress={handleSend} style={styles.button}>
+          />
+          <TouchableOpacity onPress={handleSend} style={styles.button}>
             <SendIcon width={26} height={26} fill="#007bff" />
-            </TouchableOpacity>
+          </TouchableOpacity>
         </View>
-        </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
-    );
+  );
 };
 
 const styles = StyleSheet.create({
@@ -151,7 +229,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#1e1f21",
     color: "#fff",
     borderRadius: 20,
-
   },
   button: {
     padding: 8,
