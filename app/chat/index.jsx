@@ -58,11 +58,18 @@ const ChatScreen = () => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.button} onPress={() => router.back()}>
-            <BackIcon width={35} height={25} fill={"#fff"} />
-          </TouchableOpacity>
-          <View style={styles.profileImg} />
-          <Text style={styles.title}>Tom Black</Text>
+          <View style={styles.leftHeaderSection}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => router.back()}
+            >
+              <BackIcon width={35} height={25} fill={"#fff"} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.leftHeaderSection} onPress={() => router.push("/chat/callerProfile")}>
+              <View style={styles.profileImg} />
+              <Text style={styles.title}>Tom Black</Text>
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity style={styles.button}>
             <CallIcon width={28} height={28} fill={"#fff"} stroke={"#fff"} />
           </TouchableOpacity>
@@ -194,14 +201,13 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: "center",
-    marginTop: 40,
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 10,
     marginHorizontal: 10,
+    marginTop: 10,
   },
   title: {
-    flex: 1,
     fontSize: 24,
     fontWeight: "bold",
     color: "#FFFFFF",
@@ -225,14 +231,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   input: {
+    padding: 8,
     flex: 1,
-    backgroundColor: "#1e1f21",
+    backgroundColor: "#383D42",
     color: "#fff",
     borderRadius: 20,
   },
   button: {
     padding: 8,
   },
+  leftHeaderSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
 });
 
 export default ChatScreen;
