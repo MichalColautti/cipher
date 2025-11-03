@@ -2,11 +2,20 @@ import { Stack } from "expo-router";
 
 const ProfileSettingsLayout = () => {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    />
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="editUsername"
+        options={{
+          headerShown: false, 
+        }}
+      />
+    </Stack>
   );
 };
 
