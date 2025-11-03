@@ -31,7 +31,7 @@ const ProfileScreen = () => {
       </View>
       {/* settings options */}
       <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingBox}>
+        <TouchableOpacity style={styles.settingBox} onPress={() => {router.push("/profile/profileSettings")}}>
           <View style={styles.leftOptionSection}>
             <View style={styles.profileImg} />
             <View style={styles.textContainer}>

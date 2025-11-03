@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const AccountScreen = () => {
+const ProfileSettingsScreen = () => {
   const router = useRouter();
   const { user } = useAuth();
 
@@ -173,4 +173,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AccountScreen;
+export default ProfileSettingsScreen;

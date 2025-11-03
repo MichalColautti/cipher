@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 
-const ProfileLayout = () => {
+const ProfileSettingsLayout = () => {
   return (
     <Stack
       screenOptions={{
@@ -10,4 +10,4 @@ const ProfileLayout = () => {
   );
 };
 
-export default ProfileLayout;
+export default ProfileSettingsLayout;
