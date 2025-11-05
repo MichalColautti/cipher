@@ -138,7 +138,7 @@ const ChatScreen = () => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={() => router.back()}>
             <BackIcon width={35} height={25} fill={"#fff"} />
           </TouchableOpacity>
           <View style={styles.profileImg} />
