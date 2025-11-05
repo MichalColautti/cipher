@@ -1,25 +1,7 @@
 import MessageBubble from "@/components/messageBubble";
+import { db } from "@/config/firebaseConfig";
 import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "expo-router";
-import { useEffect, useState, useRef } from "react";
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  Alert,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import AttachmentIcon from "../../assets/icons/attachment.svg";
-import BackIcon from "../../assets/icons/back.svg";
-import CallIcon from "../../assets/icons/call.svg";
-import SendIcon from "../../assets/icons/send.svg";
-import { db } from "@/config/firebaseConfig";
 import {
   addDoc,
   collection,
@@ -28,6 +10,24 @@ import {
   query,
   serverTimestamp,
 } from "firebase/firestore";
+import { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import AttachmentIcon from "../../assets/icons/attachment.svg";
+import BackIcon from "../../assets/icons/back.svg";
+import CallIcon from "../../assets/icons/call.svg";
+import SendIcon from "../../assets/icons/send.svg";
 
 const ChatScreen = () => {
   const { user, loading } = useAuth();
@@ -80,7 +80,12 @@ const ChatScreen = () => {
 
   if (loading) {
     return (
-      <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
         <ActivityIndicator size="large" color="#007bff" />
       </View>
     );
@@ -108,7 +113,6 @@ const ChatScreen = () => {
         if (scrollViewRef.current) {
           scrollViewRef.current.scrollToEnd({ animated: true });
         }
-
       } catch (error) {
         console.error("[ERROR] COULD NOT SEND THE MESSAGE:", error);
         Alert.alert("Błąd", "Nie udało się wysłać wiadomości.");
@@ -119,75 +123,82 @@ const ChatScreen = () => {
   // TIMESTAMP PARSING (DATABASE TIMESTAMP IS AN OBJECT)
   const formatTime = (timestamp) => {
     if (!timestamp) return "..."; // If the server has not confirmed yet
-    return new Date(timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return new Date(timestamp.toDate()).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#212427" }}>
-        <KeyboardAvoidingView
+      <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
-        >
+      >
         {/* Header */}
         <View style={styles.header}>
-            <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button}>
             <BackIcon width={35} height={25} fill={"#fff"} />
-            </TouchableOpacity>
-            <View style={styles.profileImg} />
-            <Text style={styles.title}>Tom Black</Text>
-            <TouchableOpacity style={styles.button}>
+          </TouchableOpacity>
+          <View style={styles.profileImg} />
+          <Text style={styles.title}>Tom Black</Text>
+          <TouchableOpacity style={styles.button}>
             <CallIcon width={28} height={28} fill={"#fff"} stroke={"#fff"} />
-            </TouchableOpacity>
+          </TouchableOpacity>
         </View>
 
         {/* Chat messages */}
         <ScrollView
-            ref={scrollViewRef}
-            style={styles.chatScreen}
-            contentContainerStyle={{ paddingBottom: 80 }}
-            // Scroll to the bottom whenever app loads up
-            onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: false })}
-            // Scroll to the bottom when user taps
-            onLayout={() => scrollViewRef.current?.scrollToEnd({ animated: false })}
+          ref={scrollViewRef}
+          style={styles.chatScreen}
+          contentContainerStyle={{ paddingBottom: 80 }}
+          // Scroll to the bottom whenever app loads up
+          onContentSizeChange={() =>
+            scrollViewRef.current?.scrollToEnd({ animated: false })
+          }
+          // Scroll to the bottom when user taps
+          onLayout={() =>
+            scrollViewRef.current?.scrollToEnd({ animated: false })
+          }
         >
-            
-            {messages.map((msg, index) => {
-              const isOwn = msg.senderId === user.id;
+          {messages.map((msg, index) => {
+            const isOwn = msg.senderId === user.id;
 
-              // Simple logic - Is the previous message from a different person?
-              const isFirstInGroup = index === 0 || messages[index - 1].senderId !== msg.senderId;
+            // Simple logic - Is the previous message from a different person?
+            const isFirstInGroup =
+              index === 0 || messages[index - 1].senderId !== msg.senderId;
 
-              return (
-                <MessageBubble
-                  key={msg.id}
-                  text={msg.text}
-                  // image={msg.image} // TODO: Add images handling
-                  time={formatTime(msg.createdAt)}
-                  isOwnMessage={isOwn}
-                  isFirstInGroup={isFirstInGroup}
-                />
-              );
+            return (
+              <MessageBubble
+                key={msg.id}
+                text={msg.text}
+                // image={msg.image} // TODO: Add images handling
+                time={formatTime(msg.createdAt)}
+                isOwnMessage={isOwn}
+                isFirstInGroup={isFirstInGroup}
+              />
+            );
           })}
         </ScrollView>
 
         {/* Message input */}
         <View style={styles.inputContainer}>
-            <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button}>
             <AttachmentIcon width={22} height={22} fill="#fff" />
-            </TouchableOpacity>
-            <TextInput
+          </TouchableOpacity>
+          <TextInput
             style={styles.input}
             value={message}
             onChangeText={setMessage}
-            />
-            <TouchableOpacity onPress={handleSend} style={styles.button}>
+          />
+          <TouchableOpacity onPress={handleSend} style={styles.button}>
             <SendIcon width={26} height={26} fill="#007bff" />
-            </TouchableOpacity>
+          </TouchableOpacity>
         </View>
-        </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
-    );
+  );
 };
 
 const styles = StyleSheet.create({
@@ -238,7 +249,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 16,
-    paddingVertical: 10,
     fontSize: 16,
   },
   button: {
