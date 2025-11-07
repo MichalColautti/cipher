@@ -14,11 +14,11 @@ import VanishingMessagesIcon from "@/assets/icons/vanishingMessages.svg";
 import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "expo-router";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const CallerProfileScreen = () => {
@@ -38,7 +38,8 @@ const CallerProfileScreen = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.profileSection}>
           <View style={styles.profileImg} />
-          <Text style={styles.profileName}>{user.username}</Text>
+          <Text style={styles.profileName}>Tom Black</Text>
+          <Text style={styles.profileUsername}>@toblerone</Text>
         </View>
 
         <Text style={styles.sectionLabel}>Customization</Text>
@@ -68,7 +69,7 @@ const CallerProfileScreen = () => {
           <TouchableOpacity style={styles.settingBox}>
             <GroupIcon width={22} height={22} />
             <View style={styles.textContainer}>
-              <Text style={styles.nameText}>Create a groupchat with Tom</Text>
+              <Text style={styles.nameText}>Create a groupchat with Tom Black</Text>
             </View>
             <ForwardIcon width={18} height={20} style={styles.forwardIcon} />
           </TouchableOpacity>
