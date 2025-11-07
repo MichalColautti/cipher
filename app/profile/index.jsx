@@ -31,7 +31,7 @@ const ProfileScreen = () => {
       </View>
       {/* settings options */}
       <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingBox}>
+        <TouchableOpacity style={styles.settingBox} onPress={() => {router.push("/profile/profileSettings")}}>
           <View style={styles.leftOptionSection}>
             <View style={styles.profileImg} />
             <View style={styles.textContainer}>
@@ -44,7 +44,7 @@ const ProfileScreen = () => {
       </View>
 
       <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingBox} onPress={() => {router.push("/profile/account")}}>
+        <TouchableOpacity style={styles.settingBox}>
           <View style={styles.leftOptionSection}>
             <AccountIcon width={24} height={24} />
             <View style={styles.textContainer}>
