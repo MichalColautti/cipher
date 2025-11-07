@@ -1,9 +1,19 @@
 import MessageBubble from "@/components/messageBubble";
+import { db } from "@/config/firebaseConfig";
 import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+} from "firebase/firestore";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -18,14 +28,55 @@ import AttachmentIcon from "../../assets/icons/attachment.svg";
 import BackIcon from "../../assets/icons/back.svg";
 import CallIcon from "../../assets/icons/call.svg";
 import SendIcon from "../../assets/icons/send.svg";
+
 const ChatScreen = () => {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [message, setMessage] = useState("");
 
+  // State to hold messages from database
+  const [messages, setMessages] = useState([]);
+  // Scrollview ref, in order to scroll downwards automatically
+  const scrollViewRef = useRef(null);
+
+  // -----------------------------------------------------------------
+  // TODO
+  // -----------------------------------------------------------------
+  // Figure a way to pass chat room ID (or friend ID) from list screen
+  // (app/index.jsx) to this screen. As for now, "test_test" is
+  // hardcoded. Ultimately, we will probably implement
+  // useLocalSearchParams from Expo Router and create chat room id
+  // from two users IDs.
+
+  const chatRoomId = "test_test";
+  // -----------------------------------------------------------------
+
   useEffect(() => {
     if (!loading && !user) router.replace("/auth");
   }, [loading, user, router]);
+
+  // REAL TIME MESSAGE LISTENING
+  useEffect(() => {
+    if (!user || !chatRoomId) return; // If user or chat room missing - do not listen
+
+    // Create a reference to 'messages' collection inside our chat room
+    const messagesRef = collection(db, "chats", chatRoomId, "messages");
+    // Create a query, in order to sort by date - from the latest message
+    const q = query(messagesRef, orderBy("createdAt", "asc"));
+
+    // Listener - launches itself every time something changes in database
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const msgs = [];
+      querySnapshot.forEach((doc) => {
+        msgs.push({ id: doc.id, ...doc.data() });
+      });
+      // Input downloaded messages into state
+      setMessages(msgs);
+    });
+
+    // Clear listener whenever user leaves chat (to prevent leaks)
+    return () => unsubscribe();
+  }, [user, chatRoomId]); // Launch it, as soon as we obtain user and chat room id
 
   if (loading) {
     return (
@@ -42,11 +93,40 @@ const ChatScreen = () => {
 
   if (!user) return null;
 
-  const handleSend = () => {
+  // MESSAGE SENDING
+  const handleSend = async () => {
     if (message.trim()) {
-      console.log("Send:", message);
-      setMessage("");
+      try {
+        // The same reference as in the listener
+        const messagesRef = collection(db, "chats", chatRoomId, "messages");
+
+        // Add new document (message) to Firestore
+        await addDoc(messagesRef, {
+          text: message.trim(),
+          senderId: user.id, // Logged user id form AuthContext
+          createdAt: serverTimestamp(), // Timestamp from the server
+        });
+
+        setMessage(""); // Clear input
+
+        // Scroll to the bottom
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollToEnd({ animated: true });
+        }
+      } catch (error) {
+        console.error("[ERROR] COULD NOT SEND THE MESSAGE:", error);
+        Alert.alert("Błąd", "Nie udało się wysłać wiadomości.");
+      }
     }
+  };
+
+  // TIMESTAMP PARSING (DATABASE TIMESTAMP IS AN OBJECT)
+  const formatTime = (timestamp) => {
+    if (!timestamp) return "..."; // If the server has not confirmed yet
+    return new Date(timestamp.toDate()).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
@@ -77,97 +157,36 @@ const ChatScreen = () => {
 
         {/* Chat messages */}
         <ScrollView
+          ref={scrollViewRef}
           style={styles.chatScreen}
           contentContainerStyle={{ paddingBottom: 80 }}
+          // Scroll to the bottom whenever app loads up
+          onContentSizeChange={() =>
+            scrollViewRef.current?.scrollToEnd({ animated: false })
+          }
+          // Scroll to the bottom when user taps
+          onLayout={() =>
+            scrollViewRef.current?.scrollToEnd({ animated: false })
+          }
         >
-          <MessageBubble
-            text="Hey where are you?"
-            time="11:40"
-            isOwnMessage={false}
-          />
-          <MessageBubble
-            text="I am still waiting for you!"
-            time="10:40"
-            isOwnMessage={false}
-            isFirstInGroup={false}
-          />
-          <MessageBubble
-            text="Hey I am here"
-            time="10:41"
-            isOwnMessage={true}
-            isFirstInGroup={true}
-          />
-          <MessageBubble
-            text="Where are you, I can’t find you. Are you on the move right now?"
-            time="10:45"
-            isOwnMessage={true}
-            isFirstInGroup={false}
-          />
-          <MessageBubble
-            image="https://placehold.co/182x289"
-            time="10:45"
-            isOwnMessage={false}
-            isFirstInGroup={true}
-          />
-          <MessageBubble
-            text="Hey where are you?"
-            time="11:40"
-            isOwnMessage={false}
-          />
-          <MessageBubble
-            text="I am still waiting for you!"
-            time="10:40"
-            isOwnMessage={false}
-            isFirstInGroup={false}
-          />
-          <MessageBubble
-            text="Hey I am here"
-            time="10:41"
-            isOwnMessage={true}
-            isFirstInGroup={true}
-          />
-          <MessageBubble
-            text="Where are you, I can’t find you. Are you on the move right now?"
-            time="10:45"
-            isOwnMessage={true}
-            isFirstInGroup={false}
-          />
-          <MessageBubble
-            image="https://placehold.co/182x289"
-            time="10:45"
-            isOwnMessage={false}
-            isFirstInGroup={true}
-          />
-          <MessageBubble
-            text="Hey where are you?"
-            time="11:40"
-            isOwnMessage={false}
-            isFirstInGroup={false}
-          />
-          <MessageBubble
-            text="I am still waiting for you!"
-            time="10:40"
-            isOwnMessage={false}
-            isFirstInGroup={false}
-          />
-          <MessageBubble
-            text="Hey I am here"
-            time="10:41"
-            isOwnMessage={true}
-            isFirstInGroup={true}
-          />
-          <MessageBubble
-            text="Where are you, I can’t find you. Are you on the move right now?"
-            time="10:45"
-            isOwnMessage={true}
-            isFirstInGroup={false}
-          />
-          <MessageBubble
-            image="https://placehold.co/182x289"
-            time="10:45"
-            isOwnMessage={false}
-            isFirstInGroup={true}
-          />
+          {messages.map((msg, index) => {
+            const isOwn = msg.senderId === user.id;
+
+            // Simple logic - Is the previous message from a different person?
+            const isFirstInGroup =
+              index === 0 || messages[index - 1].senderId !== msg.senderId;
+
+            return (
+              <MessageBubble
+                key={msg.id}
+                text={msg.text}
+                // image={msg.image} // TODO: Add images handling
+                time={formatTime(msg.createdAt)}
+                isOwnMessage={isOwn}
+                isFirstInGroup={isFirstInGroup}
+              />
+            );
+          })}
         </ScrollView>
 
         {/* Message input */}
@@ -236,6 +255,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#383D42",
     color: "#fff",
     borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    fontSize: 16,
   },
   button: {
     padding: 8,

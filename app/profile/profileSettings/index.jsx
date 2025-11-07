@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const AccountScreen = () => {
+const ProfileSettingsScreen = () => {
   const router = useRouter();
   const { user } = useAuth();
 
@@ -62,9 +62,17 @@ const AccountScreen = () => {
       </Text>
 
       <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingBox}>
+        <TouchableOpacity
+          style={styles.settingBox}
+          onPress={() =>
+            router.push({
+              pathname: "/profile/profileSettings/editUsername",
+              params: { username: user.username },
+            })
+          }
+        >
           <View style={styles.leftOptionSection}>
-            <AtIcon width={18} height={18} fill={"#fff"}/>
+            <AtIcon width={18} height={18} fill={"#fff"} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>Nazwa użytkownika</Text>
             </View>
@@ -74,7 +82,8 @@ const AccountScreen = () => {
       </View>
 
       <Text style={styles.subText}>
-        Inne osoby mogą teraz wysyłać Ci wiadomości za pomocą Twojej opcjonalnej nazwy użytkownika. Nie musisz już podawać numeru telefonu.
+        Inne osoby mogą teraz wysyłać Ci wiadomości za pomocą Twojej opcjonalnej
+        nazwy użytkownika.
       </Text>
     </View>
   );
@@ -173,4 +182,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AccountScreen;
+export default ProfileSettingsScreen;
