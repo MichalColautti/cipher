@@ -1,18 +1,14 @@
 import BackIcon from "@/assets/icons/back.svg";
+import { useTheme } from "@/contexts/themeContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import {
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 
 const NotificationsScreen = () => {
   const router = useRouter();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const { colors } = useTheme();
 
   useEffect(() => {
     const loadNotificationSetting = async () => {
@@ -38,12 +34,19 @@ const NotificationsScreen = () => {
     }
   };
 
+  const styles = getStyles(colors);
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <BackIcon width={35} height={25} stroke={"#fff"} />
+          <BackIcon
+            width={35}
+            height={25}
+            color={colors.iconFill}
+            fill={colors.iconFill}
+          />
         </TouchableOpacity>
         <Text style={styles.title}>Notifications</Text>
       </View>
@@ -52,7 +55,7 @@ const NotificationsScreen = () => {
         <View style={styles.settingBox}>
           <Text style={styles.nameText}>Enable Notifications</Text>
           <Switch
-            trackColor={{ false: "#aaa", true: "#00ff04" }}
+            trackColor={{ false: "#767577", true: colors.button }}
             thumbColor={"#fff"}
             onValueChange={toggleNotifications}
             value={notificationsEnabled}
@@ -63,43 +66,44 @@ const NotificationsScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#212427",
-    padding: 22,
-  },
-  header: {
-    alignItems: "center",
-    marginTop: 30,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 18,
-  },
-  title: {
-    flex: 1,
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
-    marginRight: 35,
-  },
-  settingsContainer: {
-    marginTop: 22,
-    backgroundColor: "#383D42",
-    borderRadius: 5,
-  },
-  settingBox: {
-    padding: 15,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  nameText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "600",
-  },
-});
+const getStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 22,
+    },
+    header: {
+      alignItems: "center",
+      marginTop: 30,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 18,
+    },
+    title: {
+      flex: 1,
+      fontSize: 32,
+      fontWeight: "bold",
+      color: colors.title,
+      textAlign: "center",
+      marginRight: 35,
+    },
+    settingsContainer: {
+      marginTop: 22,
+      backgroundColor: colors.settingsBackground,
+      borderRadius: 5,
+    },
+    settingBox: {
+      padding: 15,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    nameText: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "600",
+    },
+  });
 
 export default NotificationsScreen;

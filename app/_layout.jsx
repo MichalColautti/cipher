@@ -1,14 +1,17 @@
 import { AuthProvider } from "@/contexts/authContext";
+import { ThemeProvider } from "@/contexts/themeContext";
 import { Stack } from "expo-router";
 
 const RootLayout = () => {
   return (
     <AuthProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      />
+      <ThemeProvider>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        />
+      </ThemeProvider>
     </AuthProvider>
   );
 };
