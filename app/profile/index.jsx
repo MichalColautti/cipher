@@ -80,7 +80,10 @@ const ProfileScreen = () => {
       </View>
 
       <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingBox}>
+        <TouchableOpacity
+          style={styles.settingBox}
+          onPress={() => router.push("/profile/profileSettings/appearance")}
+        >
           <View style={styles.leftOptionSection}>
             <AppearanceIcon width={24} height={24} />
             <View style={styles.textContainer}>
@@ -92,7 +95,10 @@ const ProfileScreen = () => {
 
         <View style={styles.divider} />
 
-        <TouchableOpacity style={styles.settingBox}>
+        <TouchableOpacity
+          style={styles.settingBox}
+          onPress={() => router.push("/profile/profileSettings/notifications")}
+        >
           <View style={styles.leftOptionSection}>
             <NotificationsIcon width={24} height={24} />
             <View style={styles.textContainer}>
