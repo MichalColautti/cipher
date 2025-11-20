@@ -11,7 +11,7 @@ import PrivacyIcon from "@/assets/icons/privacy.svg";
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const ProfileScreen = () => {
   const router = useRouter();
@@ -46,7 +46,11 @@ const ProfileScreen = () => {
           }}
         >
           <View style={styles.leftOptionSection}>
-            <View style={styles.profileImg} />
+            {user?.profileImage ? (
+              <Image source={{ uri: user.profileImage }} style={styles.profileImg} />
+            ) : (
+              <View style={styles.profileImg} />
+            )}
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>{user?.email}</Text>
               <Text style={styles.atText}>@{user?.username}</Text>
@@ -191,7 +195,7 @@ const getStyles = (colors, theme) =>
     settingsContainer: {
       marginTop: 22,
       backgroundColor: colors.settingsBackground,
-      borderRadius: 5,
+      borderRadius: 8,
       ...(theme === "light" && {
         borderWidth: 1,
         borderColor: "#E5E7EB",
