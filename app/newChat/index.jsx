@@ -7,8 +7,9 @@ import SearchIcon from "@/assets/icons/search.svg";
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
 import { getMyFriends } from "@/services/userService";
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
     ActivityIndicator,
     SectionList,
@@ -36,21 +37,24 @@ const NewChatScreen = () => {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
 
-  // Load friends on mount
-  useEffect(() => {
-    const loadFriends = async () => {
-      if (!user) return;
-      try {
-        const myFriends = await getMyFriends(user.id || user.uid);
-        setFriends(myFriends);
-      } catch (error) {
-        console.error("Błąd pobierania znajomych:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadFriends();
-  }, [user]);
+  // Fetch friends whenever the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      const loadFriends = async () => {
+        if (!user) return;
+        setLoading(true);
+        try {
+          const myFriends = await getMyFriends(user.id || user.uid);
+          setFriends(myFriends);
+        } catch (error) {
+          console.error("Błąd pobierania znajomych:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadFriends();
+    }, [user])
+  );
 
   // Open chat with selected user
   const openChat = (otherUser) => {
