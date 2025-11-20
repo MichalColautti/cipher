@@ -11,13 +11,12 @@ import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
-    Alert,
     SectionList,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -63,12 +62,13 @@ const NewChatScreen = () => {
     };
 
     const handleAddByTag = () => {
-        // TODO: Implement adding by Cipher tag
+    router.push({ pathname: "/contacts/", params: { method: "tag" } });
     };
 
     const handleAddByEmail = () => {
-        // TODO: Implement adding by Email
+    router.push({ pathname: "/contacts/", params: { method: "email" } });
     };
+
 
     // Function to group and filter friends by search text
     const sections = useMemo(() => {
@@ -154,6 +154,7 @@ const NewChatScreen = () => {
                     IconComponent={MailIcon}
                     colors={colors}
                     isLast={true}
+                    onPress={handleAddByEmail}
                 />
             </View>
 
