@@ -74,7 +74,7 @@ const getStyles = (colors, theme) =>
     settingsContainer: {
       marginTop: 22,
       backgroundColor: colors.settingsBackground,
-      borderRadius: 5,
+      borderRadius: 8,
       ...(theme === "light" && {
         borderWidth: 1,
         borderColor: "#E5E7EB",

@@ -112,7 +112,7 @@ const getStyles = (colors, theme) =>
     },
     inputContainer: {
       backgroundColor: colors.inputBackground,
-      borderRadius: 5,
+      borderRadius: 8,
       paddingHorizontal: 15,
       marginTop: 40,
       flexDirection: "row",

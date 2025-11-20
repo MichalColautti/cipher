@@ -5,14 +5,66 @@ import EditIcon from "@/assets/icons/edit.svg";
 import ForwardIcon from "@/assets/icons/forward.svg";
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
+import { uploadImage } from "@/services/imageService";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { doc, getFirestore, updateDoc } from "firebase/firestore";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const ProfileSettingsScreen = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, updateUserContext } = useAuth();
   const { theme, colors } = useTheme();
   const styles = getStyles(colors, theme);
+  const [loading, setLoading] = useState(false);
+
+  const handleUpdatePhoto = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.5,
+      });
+
+      if (!result.canceled) {
+        setLoading(true);
+        const localUri = result.assets[0].uri;
+
+        const cloudUrl = await uploadImage(localUri);
+
+        if (!cloudUrl) {
+          throw new Error("Nie udało się załadować zdjęcia.");
+        }
+
+        const db = getFirestore();
+        const userRef = doc(db, "users", user.id);
+        await updateDoc(userRef, {
+          profileImage: cloudUrl,
+        });
+
+        if (updateUserContext) {
+          updateUserContext({ ...user, profileImage: cloudUrl });
+        }
+
+        Alert.alert("Sukces", "Zdjęcie profilowe zostało zmienione.");
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Błąd", "Wystąpił problem podczas zmiany zdjęcia.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -34,9 +86,34 @@ const ProfileSettingsScreen = () => {
       </View>
 
       <View style={styles.profileSection}>
-        <View style={styles.profileImg} />
-        <TouchableOpacity style={styles.editPhotoBtn}>
-          <Text style={styles.editPhotoBtnText}>Edytuj zdjęcie</Text>
+        <TouchableOpacity onPress={handleUpdatePhoto} disabled={loading}>
+          {loading ? (
+            <View
+              style={[
+                styles.profileImg,
+                { justifyContent: "center", alignItems: "center" },
+              ]}
+            >
+              <ActivityIndicator size="small" color={colors.text} />
+            </View>
+          ) : user?.profileImage ? (
+            <Image
+              source={{ uri: user.profileImage }}
+              style={styles.profileImg}
+            />
+          ) : (
+            <View style={styles.profileImg} />
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.editPhotoBtn}
+          onPress={handleUpdatePhoto}
+          disabled={loading}
+        >
+          <Text style={styles.editPhotoBtnText}>
+            {loading ? "Wysyłanie..." : "Edytuj zdjęcie"}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -124,11 +201,12 @@ const getStyles = (colors, theme) =>
       height: 74,
       borderRadius: 37,
       backgroundColor: colors.button,
+      overflow: "hidden",
     },
     settingsContainer: {
       marginTop: 22,
       backgroundColor: colors.settingsBackground,
-      borderRadius: 5,
+      borderRadius: 8,
       ...(theme === "light" && {
         borderWidth: 1,
         borderColor: "#E5E7EB",

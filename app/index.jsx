@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import {
   ActivityIndicator,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -41,7 +42,11 @@ const HomeScreen = () => {
                 router.push("/profile");
               }}
             >
-              <View style={styles.profileImg} />
+              {user?.profileImage ? (
+                <Image source={{ uri: user.profileImage }} style={styles.profileImg} />
+              ) : (
+                <View style={styles.profileImg} />
+              )}
             </TouchableOpacity>
             <Text style={styles.title}>Cipher</Text>
             <TouchableOpacity style={styles.addButton}>

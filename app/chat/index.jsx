@@ -146,28 +146,15 @@ const ChatScreen = () => {
               style={styles.button}
               onPress={() => router.back()}
             >
-              <BackIcon
-                width={35}
-                height={25}
-                color={colors.iconFill}
-                fill={colors.iconFill}
-              />
+            <BackIcon width={35} height={25} color={colors.iconFill} fill={colors.iconFill}/>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.leftHeaderSection}
-              onPress={() => router.push("/chat/callerProfile")}
-            >
+            <TouchableOpacity style={styles.leftHeaderSection} onPress={() => router.push("/chat/callerProfile")}>
               <View style={styles.profileImg} />
               <Text style={styles.title}>Tom Black</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.button}>
-            <CallIcon
-              width={28}
-              height={28}
-              fill={colors.iconFill}
-              stroke={colors.iconStroke}
-            />
+            <CallIcon width={28} height={28} fill={colors.iconFill} stroke={colors.iconStroke} />
           </TouchableOpacity>
         </View>
 
@@ -208,7 +195,7 @@ const ChatScreen = () => {
         {/* Message input */}
         <View style={styles.inputContainer}>
           <TouchableOpacity style={styles.button}>
-            <AttachmentIcon width={22} height={22} color={colors.iconFill} />
+            <AttachmentIcon width={22} height={22} color={colors.iconFill}/>
           </TouchableOpacity>
           <TextInput
             style={styles.input}
