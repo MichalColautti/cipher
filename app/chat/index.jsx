@@ -2,7 +2,7 @@ import MessageBubble from "@/components/messageBubble";
 import { db } from "@/config/firebaseConfig";
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   addDoc,
   collection,
@@ -31,6 +31,7 @@ import CallIcon from "../../assets/icons/call.svg";
 import SendIcon from "../../assets/icons/send.svg";
 
 const ChatScreen = () => {
+  const params = useLocalSearchParams();
   const { user, loading } = useAuth();
   const { colors } = useTheme();
   const styles = getStyles(colors);
@@ -42,16 +43,10 @@ const ChatScreen = () => {
   // Scrollview ref, in order to scroll downwards automatically
   const scrollViewRef = useRef(null);
 
-  // -----------------------------------------------------------------
-  // TODO
-  // -----------------------------------------------------------------
-  // Figure a way to pass chat room ID (or friend ID) from list screen
-  // (app/index.jsx) to this screen. As for now, "test_test" is
-  // hardcoded. Ultimately, we will probably implement
-  // useLocalSearchParams from Expo Router and create chat room id
-  // from two users IDs.
+  const chatRoomId = params.roomId ? String(params.roomId) : null;
+  const contactName = params.contactName ? String(params.contactName) : null;
+  const myId = user?.id ?? user?.uid;
 
-  const chatRoomId = "test_test";
   // -----------------------------------------------------------------
 
   useEffect(() => {
@@ -106,7 +101,7 @@ const ChatScreen = () => {
         // Add new document (message) to Firestore
         await addDoc(messagesRef, {
           text: message.trim(),
-          senderId: user.id, // Logged user id form AuthContext
+          senderId: myId, // Logged user id form AuthContext
           createdAt: serverTimestamp(), // Timestamp from the server
         });
 
@@ -158,7 +153,7 @@ const ChatScreen = () => {
               onPress={() => router.push("/chat/callerProfile")}
             >
               <View style={styles.profileImg} />
-              <Text style={styles.title}>Tom Black</Text>
+              <Text style={styles.title}>{contactName}</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.button}>
@@ -186,7 +181,7 @@ const ChatScreen = () => {
           }
         >
           {messages.map((msg, index) => {
-            const isOwn = msg.senderId === user.id;
+            const isOwn = msg.senderId === myId;
 
             // Simple logic - Is the previous message from a different person?
             const isFirstInGroup =

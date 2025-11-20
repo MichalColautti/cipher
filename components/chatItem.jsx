@@ -1,15 +1,35 @@
+import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const ChatItem = ({ name, message, time, targetScreen }) => {
+const ChatItem = ({ name, message, time, friendId }) => {
   const router = useRouter();
   const { colors } = useTheme();
+  const { user } = useAuth();
+
+  const makeChatRoomId = (idA, idB) =>
+    [String(idA), String(idB)].sort().join("_");
 
   const handlePress = () => {
-    if (targetScreen) {
-      router.push(targetScreen);
+    if (!friendId) {
+      console.warn("ChatItem: missing friendId");
+      return;
     }
+
+    const myId = user?.id ?? user?.uid;
+    if (!myId) {
+      console.warn("ChatItem: no logged user");
+      return;
+    }
+
+    const roomId = makeChatRoomId(myId, friendId);
+
+    router.push({
+      pathname: "/chat",
+      params: { roomId, friendId, contactName: name },
+    });
+
   };
 
   const styles = getStyles(colors);

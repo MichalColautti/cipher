@@ -74,32 +74,32 @@ const HomeScreen = () => {
               name="Tom Black"
               message="Where I can't find you"
               time="4 min"
-              targetScreen="/chat"
+              friendId="Tom Black"
             />
             <ChatItem
               name="Julie 🤍"
               message="I'll be back at 5"
               time="47 min"
-              targetScreen="/chat"
+              friendId="Julie"
             />
             <Text style={styles.subtitle}>Chats</Text>
             <ChatItem
               name="Sheldon"
               message="Thanks mate."
               time="2 day"
-              targetScreen="/chat"
+              friendId="Sheldon"
             />
             <ChatItem
               name="Dad"
               message="👍"
               time="3 day"
-              targetScreen="/chat"
+              friendId="Dad"
             />
             <ChatItem
               name="James Leaf"
               message="The deadline for the project is now on Friday instead of next Monday, please confirm."
               time="5 day"
-              targetScreen="/chat"
+              friendId="James Leaf"
             />
           </ScrollView>
         </View>
