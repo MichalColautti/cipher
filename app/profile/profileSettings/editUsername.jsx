@@ -17,8 +17,8 @@ import {
 const EditUsernameScreen = () => {
   const router = useRouter();
   const { user, updateUserContext } = useAuth();
-  const { colors } = useTheme();
-  const styles = getStyles(colors);
+  const { theme, colors } = useTheme();
+  const styles = getStyles(colors, theme);
 
   const params = useLocalSearchParams();
   const [username, setUsername] = useState(params.username || "");
@@ -74,7 +74,7 @@ const EditUsernameScreen = () => {
   );
 };
 
-const getStyles = (colors) =>
+const getStyles = (colors, theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -112,11 +112,23 @@ const getStyles = (colors) =>
     },
     inputContainer: {
       backgroundColor: colors.inputBackground,
-      borderRadius: 5,
+      borderRadius: 8,
       paddingHorizontal: 15,
       marginTop: 40,
       flexDirection: "row",
       alignItems: "center",
+      ...(theme === "light" && {
+        borderWidth: 1,
+        borderColor: "#E5E7EB",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 1,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 1,
+        elevation: 2,
+      }),
     },
     input: {
       flex: 1,

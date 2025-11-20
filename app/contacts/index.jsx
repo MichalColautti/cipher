@@ -4,12 +4,19 @@ import MailIcon from "@/assets/icons/mail.svg";
 import { db } from "@/config/firebaseConfig";
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
-import { addFriend, getUserByUsername } from "@/services/userService";
+import { addFriend, getUserByEmail, getUserByUsername } from "@/services/userService";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
 import { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { getUserByEmail } from "../../services/userService";
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
 
 const AddContactScreen = () => {
   const router = useRouter();
@@ -28,57 +35,52 @@ const AddContactScreen = () => {
   const Icon = isTag ? AtIcon : MailIcon;
 
   const handleAdd = async () => {
-
     if (!user) {
-        return;
+      return;
     }
 
     setLoading(true);
     try {
-        let friendUser = null;
-        if (isTag) {
+      let friendUser = null;
+      if (isTag) {
         friendUser = await getUserByUsername(value.trim());
-        } else {
+      } else {
         friendUser = await getUserByEmail(value.trim());
-        }
+      }
 
-
-        if (!friendUser) {
+      if (!friendUser) {
         setLoading(false);
         return;
-        }
+      }
 
-        // check if self-add
-        const myId = user.id || user.uid;
-        if (friendUser.id === myId) {
+      // check if self-add
+      const myId = user.id || user.uid;
+      if (friendUser.id === myId) {
         setLoading(false);
         return;
-        }
+      }
 
-        // check if already friends
-        const friendDocRef = doc(db, "users", myId, "friends", friendUser.id);
-        const friendDocSnap = await getDoc(friendDocRef);
-        if (friendDocSnap.exists()) {
+      // check if already friends
+      const friendDocRef = doc(db, "users", myId, "friends", friendUser.id);
+      const friendDocSnap = await getDoc(friendDocRef);
+      if (friendDocSnap.exists()) {
         setLoading(false);
         return;
-        }
+      }
 
-        // add friend
-        const result = await addFriend(myId, {
+      // add friend
+      const result = await addFriend(myId, {
         id: friendUser.id,
         username: friendUser.username,
         email: friendUser.email,
-        });
-
-
+      });
     } catch (err) {
-        console.error("Add contact failed:", err);
-        Alert.alert("Error", err.message || "Could not add contact.");
+      console.error("Add contact failed:", err);
+      Alert.alert("Error", err.message || "Could not add contact.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-    };
-
+  };
 
   return (
     <View style={styles.container}>
@@ -112,7 +114,9 @@ const AddContactScreen = () => {
         disabled={loading}
         accessibilityLabel="Add contact"
       >
-        <Text style={styles.saveButtonText}>{loading ? (isTag ? "Adding..." : "Sending...") : "ADD"}</Text>
+        <Text style={styles.saveButtonText}>
+          {loading ? (isTag ? "Adding..." : "Sending...") : "ADD"}
+        </Text>
       </TouchableOpacity>
     </View>
   );

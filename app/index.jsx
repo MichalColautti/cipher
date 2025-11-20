@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import {
   ActivityIndicator,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -41,7 +42,14 @@ const HomeScreen = () => {
                 router.push("/profile");
               }}
             >
-              <View style={styles.profileImg} />
+              {user?.profileImage ? (
+                <Image
+                  source={{ uri: user.profileImage }}
+                  style={styles.profileImg}
+                />
+              ) : (
+                <View style={styles.profileImg} />
+              )}
             </TouchableOpacity>
             <Text style={styles.title}>Cipher</Text>
             <TouchableOpacity
@@ -89,12 +97,7 @@ const HomeScreen = () => {
               time="2 day"
               friendId="Sheldon"
             />
-            <ChatItem
-              name="Dad"
-              message="👍"
-              time="3 day"
-              friendId="Dad"
-            />
+            <ChatItem name="Dad" message="👍" time="3 day" friendId="Dad" />
             <ChatItem
               name="James Leaf"
               message="The deadline for the project is now on Friday instead of next Monday, please confirm."

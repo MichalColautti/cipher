@@ -20,7 +20,7 @@ export const darkThemeColors = {
 };
 
 export const lightThemeColors = {
-  background: "#F9F6F0",
+  background: "#fff",
   text: "#000",
   title: "#000",
   settingsBackground: "#fff",
@@ -29,7 +29,7 @@ export const lightThemeColors = {
   iconFill: "#000",
   button: "#007bff",
   buttonText: "#fff",
-  inputBackground: "#fff",
+  inputBackground: "#f4f4f4ff",
   placeholder: "#666",
   outgoingBubble: "#648BCE",
   incomingBubble: "#212427",
