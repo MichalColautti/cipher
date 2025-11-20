@@ -64,11 +64,11 @@ const NewChatScreen = () => {
   };
 
   const handleAddByTag = () => {
-    // TODO: Implement adding by Cipher tag
+    router.push({ pathname: "/contacts/", params: { method: "tag" } });
   };
 
   const handleAddByEmail = () => {
-    // TODO: Implement adding by Email
+    router.push({ pathname: "/contacts/", params: { method: "email" } });
   };
 
   // Function to group and filter friends by search text

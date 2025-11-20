@@ -1,13 +1,13 @@
 import { db } from "@/config/firebaseConfig";
 import {
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    query,
-    setDoc,
-    where,
-    serverTimestamp,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
 } from "firebase/firestore";
 import { Alert } from "react-native";
 
@@ -38,6 +38,21 @@ export const getUserByUsername = async (username) => {
 
   if (!snapshot.empty) {
     // Return the first matched user, cipher tags are unique
+    const userDoc = snapshot.docs[0];
+    return { id: userDoc.id, ...userDoc.data() };
+  }
+  return null;
+};
+
+export const getUserByEmail = async (email) => {
+  if (!email) return null;
+
+  const usersRef = collection(db, "users");
+  const q = query(usersRef, where("email", "==", email));
+
+  const snapshot = await getDocs(q);
+
+  if (!snapshot.empty) {
     const userDoc = snapshot.docs[0];
     return { id: userDoc.id, ...userDoc.data() };
   }

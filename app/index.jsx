@@ -43,7 +43,10 @@ const HomeScreen = () => {
               }}
             >
               {user?.profileImage ? (
-                <Image source={{ uri: user.profileImage }} style={styles.profileImg} />
+                <Image
+                  source={{ uri: user.profileImage }}
+                  style={styles.profileImg}
+                />
               ) : (
                 <View style={styles.profileImg} />
               )}
@@ -94,12 +97,7 @@ const HomeScreen = () => {
               time="2 day"
               friendId="Sheldon"
             />
-            <ChatItem
-              name="Dad"
-              message="👍"
-              time="3 day"
-              friendId="Dad"
-            />
+            <ChatItem name="Dad" message="👍" time="3 day" friendId="Dad" />
             <ChatItem
               name="James Leaf"
               message="The deadline for the project is now on Friday instead of next Monday, please confirm."
