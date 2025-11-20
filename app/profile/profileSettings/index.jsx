@@ -11,8 +11,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 const ProfileSettingsScreen = () => {
   const router = useRouter();
   const { user } = useAuth();
-  const { colors } = useTheme();
-  const styles = getStyles(colors);
+  const { theme, colors } = useTheme();
+  const styles = getStyles(colors, theme);
 
   return (
     <View style={styles.container}>
@@ -97,7 +97,7 @@ const ProfileSettingsScreen = () => {
   );
 };
 
-const getStyles = (colors) =>
+const getStyles = (colors, theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -129,6 +129,18 @@ const getStyles = (colors) =>
       marginTop: 22,
       backgroundColor: colors.settingsBackground,
       borderRadius: 5,
+      ...(theme === "light" && {
+        borderWidth: 1,
+        borderColor: "#E5E7EB",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 1,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 1,
+        elevation: 2,
+      }),
     },
     settingBox: {
       padding: 15,

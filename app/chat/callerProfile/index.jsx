@@ -25,8 +25,8 @@ import {
 const CallerProfileScreen = () => {
   const { user } = useAuth();
   const router = useRouter();
-  const { colors } = useTheme();
-  const styles = getStyles(colors);
+  const { theme, colors } = useTheme();
+  const styles = getStyles(colors, theme);
 
   return (
     <View style={styles.container}>
@@ -150,7 +150,7 @@ const CallerProfileScreen = () => {
   );
 };
 
-const getStyles = (colors) =>
+const getStyles = (colors, theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -203,6 +203,18 @@ const getStyles = (colors) =>
       borderRadius: 8,
       marginHorizontal: 13,
       marginBottom: 0,
+      ...(theme === "light" && {
+        borderWidth: 1,
+        borderColor: "#E5E7EB",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 1,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 1,
+        elevation: 2,
+      }),
     },
     settingBox: {
       flexDirection: "row",
