@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -45,6 +46,7 @@ const ChatScreen = () => {
 
   const chatRoomId = params.roomId ? String(params.roomId) : null;
   const contactName = params.contactName ? String(params.contactName) : null;
+  const contactImage = params.contactImage ? String(params.contactImage) : null;
   const myId = user?.id ?? user?.uid;
 
   // -----------------------------------------------------------------
@@ -150,9 +152,30 @@ const ChatScreen = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.leftHeaderSection}
-              onPress={() => router.push("/chat/callerProfile")}
+              onPress={() =>
+                router.push({
+                  pathname: "/chat/callerProfile",
+                  params: { name: contactName, image: contactImage },
+                })
+              }
             >
-              <View style={styles.profileImg} />
+              {contactImage ? (
+                <Image
+                  source={{ uri: contactImage }}
+                  style={styles.profileImg}
+                />
+              ) : (
+                <View
+                  style={[
+                    styles.profileImg,
+                    { justifyContent: "center", alignItems: "center" },
+                  ]}
+                >
+                  <Text style={styles.avatarText}>
+                    {contactName?.charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+              )}
               <Text style={styles.title}>{contactName}</Text>
             </TouchableOpacity>
           </View>
@@ -252,6 +275,11 @@ const getStyles = (colors) =>
       backgroundColor: colors.button,
       marginRight: 10,
       marginLeft: 5,
+    },
+    avatarText: {
+      color: "#fff",
+      fontWeight: "bold",
+      fontSize: 18,
     },
     addButton: {
       color: colors.text,

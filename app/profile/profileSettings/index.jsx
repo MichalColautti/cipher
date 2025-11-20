@@ -30,7 +30,7 @@ const ProfileSettingsScreen = () => {
   const handleUpdatePhoto = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: "Images",
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.5,
@@ -102,7 +102,16 @@ const ProfileSettingsScreen = () => {
               style={styles.profileImg}
             />
           ) : (
-            <View style={styles.profileImg} />
+            <View
+              style={[
+                styles.profileImg,
+                { justifyContent: "center", alignItems: "center" },
+              ]}
+            >
+              <Text style={styles.avatarText}>
+                {user?.username?.charAt(0).toUpperCase()}
+              </Text>
+            </View>
           )}
         </TouchableOpacity>
 
@@ -202,6 +211,11 @@ const getStyles = (colors, theme) =>
       borderRadius: 37,
       backgroundColor: colors.button,
       overflow: "hidden",
+    },
+    avatarText: {
+      color: "#fff",
+      fontWeight: "bold",
+      fontSize: 32,
     },
     settingsContainer: {
       marginTop: 22,

@@ -1,8 +1,10 @@
 import ChatItem from "@/components/chatItem";
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
+import { getMyFriends } from "@/services/userService";
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -20,6 +22,7 @@ const HomeScreen = () => {
   const { user, loading, logout } = useAuth();
   const { colors } = useTheme();
   const styles = getStyles(colors);
+  const [friends, setFriends] = useState([]);
 
   const router = useRouter();
 
@@ -28,6 +31,41 @@ const HomeScreen = () => {
       router.replace("/auth");
     }
   }, [user, loading, router]);
+
+  // Fetch friends whenever the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      const loadFriends = async () => {
+        if (!user) return;
+        try {
+          const myFriends = await getMyFriends(user.id || user.uid);
+          setFriends(myFriends);
+        } catch (error) {
+          console.error("Błąd pobierania znajomych na ekranie głównym:", error);
+        }
+      };
+      loadFriends();
+    }, [user])
+  );
+
+  const getChatRoomId = (user1, user2) => {
+    const sortedIds = [user1, user2].sort();
+    return sortedIds.join("_");
+  };
+
+  const openChat = (otherUser) => {
+    const myId = user.id || user.uid;
+    const roomId = getChatRoomId(myId, otherUser.id);
+
+    router.push({
+      pathname: "/chat",
+      params: {
+        roomId,
+        contactName: otherUser.username,
+        contactImage: otherUser.profileImage,
+      },
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -48,7 +86,16 @@ const HomeScreen = () => {
                   style={styles.profileImg}
                 />
               ) : (
-                <View style={styles.profileImg} />
+                <View
+                  style={[
+                    styles.profileImg,
+                    { justifyContent: "center", alignItems: "center" },
+                  ]}
+                >
+                  <Text style={styles.avatarText}>
+                    {user?.username?.charAt(0).toUpperCase()}
+                  </Text>
+                </View>
               )}
             </TouchableOpacity>
             <Text style={styles.title}>Cipher</Text>
@@ -77,33 +124,17 @@ const HomeScreen = () => {
 
           {/* chat list */}
           <ScrollView>
-            <Text style={styles.subtitle}>Pinned</Text>
-            <ChatItem
-              name="Tom Black"
-              message="Where I can't find you"
-              time="4 min"
-              friendId="Tom Black"
-            />
-            <ChatItem
-              name="Julie 🤍"
-              message="I'll be back at 5"
-              time="47 min"
-              friendId="Julie"
-            />
             <Text style={styles.subtitle}>Chats</Text>
-            <ChatItem
-              name="Sheldon"
-              message="Thanks mate."
-              time="2 day"
-              friendId="Sheldon"
-            />
-            <ChatItem name="Dad" message="👍" time="3 day" friendId="Dad" />
-            <ChatItem
-              name="James Leaf"
-              message="The deadline for the project is now on Friday instead of next Monday, please confirm."
-              time="5 day"
-              friendId="James Leaf"
-            />
+            {friends.map((friend) => (
+              <ChatItem
+                key={friend.id}
+                name={friend.username}
+                message="Tap to start a conversation"
+                time="now"
+                imageUri={friend.profileImage}
+                onPress={() => openChat(friend)}
+              />
+            ))}
           </ScrollView>
         </View>
       ) : null}
@@ -140,6 +171,11 @@ const getStyles = (colors) =>
       height: 40,
       borderRadius: 20,
       backgroundColor: colors.button,
+    },
+    avatarText: {
+      color: "#fff",
+      fontWeight: "bold",
+      fontSize: 18,
     },
     addButton: {
       color: colors.text,

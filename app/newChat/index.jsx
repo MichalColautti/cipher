@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import {
     ActivityIndicator,
+    Image,
     SectionList,
     StyleSheet,
     Text,
@@ -63,7 +64,11 @@ const NewChatScreen = () => {
 
     router.push({
       pathname: "/chat",
-      params: { roomId: roomId, contactName: otherUser.username },
+      params: {
+        roomId: roomId,
+        contactName: otherUser.username,
+        contactImage: otherUser.profileImage,
+      },
     });
   };
 
@@ -107,11 +112,15 @@ const NewChatScreen = () => {
       style={[styles.userItem, { backgroundColor: colors.settingsBackground }]}
       onPress={() => openChat(item)}
     >
-      <View style={[styles.avatar, { backgroundColor: colors.button }]}>
-        <Text style={styles.avatarText}>
-          {item.username?.charAt(0).toUpperCase()}
-        </Text>
-      </View>
+      {item.profileImage ? (
+        <Image source={{ uri: item.profileImage }} style={styles.avatar} />
+      ) : (
+        <View style={[styles.avatar, { backgroundColor: colors.button }]}>
+          <Text style={styles.avatarText}>
+            {item.username?.charAt(0).toUpperCase()}
+          </Text>
+        </View>
+      )}
       <Text style={[styles.userName, { color: colors.text }]}>
         {item.username}
       </Text>

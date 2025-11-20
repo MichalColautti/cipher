@@ -4,7 +4,11 @@ import MailIcon from "@/assets/icons/mail.svg";
 import { db } from "@/config/firebaseConfig";
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
-import { addFriend, getUserByEmail, getUserByUsername } from "@/services/userService";
+import {
+  addFriend,
+  getUserByEmail,
+  getUserByUsername,
+} from "@/services/userService";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
 import { useState } from "react";
@@ -16,7 +20,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 
 const AddContactScreen = () => {
   const router = useRouter();
@@ -73,6 +76,7 @@ const AddContactScreen = () => {
         id: friendUser.id,
         username: friendUser.username,
         email: friendUser.email,
+        profileImage: friendUser.profileImage || null,
       });
     } catch (err) {
       console.error("Add contact failed:", err);

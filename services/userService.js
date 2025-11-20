@@ -74,7 +74,7 @@ export const addFriend = async (currentUserId, friendUser) => {
     // Add friend to current user's friends subcollection
     await setDoc(doc(db, "users", currentUserId, "friends", friendUser.id), {
       username: friendUser.username,
-      addedAt: serverTimestamp()
+      addedAt: serverTimestamp(),
     });
 
     // Also add current user to friend's friends subcollection
@@ -82,7 +82,7 @@ export const addFriend = async (currentUserId, friendUser) => {
     await setDoc(doc(db, "users", friendUser.id, "friends", currentUserId), {
       username: currentUserData.username,
       email: currentUserData.email,
-      addedAt: serverTimestamp()
+      addedAt: serverTimestamp(),
     });
 
     return { success: true };
@@ -94,6 +94,13 @@ export const addFriend = async (currentUserId, friendUser) => {
 
 export const getMyFriends = async (userId) => {
   const friendsRef = collection(db, "users", userId, "friends");
-  const snapshot = await getDocs(friendsRef);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const friendsSnapshot = await getDocs(friendsRef);
+
+  const friendPromises = friendsSnapshot.docs.map((friendDoc) =>
+    getUserById(friendDoc.id)
+  );
+
+  const friends = await Promise.all(friendPromises);
+
+  return friends.filter((friend) => friend !== null);
 };

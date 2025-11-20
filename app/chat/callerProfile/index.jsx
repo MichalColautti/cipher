@@ -13,8 +13,9 @@ import VanishingMessagesIcon from "@/assets/icons/vanishingMessages.svg";
 
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -25,6 +26,7 @@ import {
 const CallerProfileScreen = () => {
   const { user } = useAuth();
   const router = useRouter();
+  const params = useLocalSearchParams();
   const { theme, colors } = useTheme();
   const styles = getStyles(colors, theme);
 
@@ -40,9 +42,21 @@ const CallerProfileScreen = () => {
       {/* Customization */}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.profileSection}>
-          <View style={styles.profileImg} />
-          <Text style={styles.profileName}>Tom Black</Text>
-          <Text style={styles.profileUsername}>@toblerone</Text>
+          {params.image ? (
+            <Image source={{ uri: params.image }} style={styles.profileImg} />
+          ) : (
+            <View
+              style={[
+                styles.profileImg,
+                { justifyContent: "center", alignItems: "center" },
+              ]}
+            >
+              <Text style={styles.avatarText}>
+                {params.name?.charAt(0).toUpperCase()}
+              </Text>
+            </View>
+          )}
+          <Text style={styles.profileName}>{params.name || "Contact"}</Text>
         </View>
 
         <Text style={styles.sectionLabel}>Customization</Text>
@@ -72,8 +86,8 @@ const CallerProfileScreen = () => {
           <TouchableOpacity style={styles.settingBox}>
             <GroupIcon width={22} height={22} color={colors.iconFill} />
             <View style={styles.textContainer}>
-              <Text style={styles.nameText}>
-                Create a groupchat with Tom Black
+              <Text style={styles.nameText} numberOfLines={1}>
+                Create a groupchat with {params.name || "Contact"}
               </Text>
             </View>
             <ForwardIcon width={18} height={20} style={styles.forwardIcon} />
@@ -171,6 +185,11 @@ const getStyles = (colors, theme) =>
       borderRadius: 44,
       marginVertical: 10,
       backgroundColor: colors.button,
+    },
+    avatarText: {
+      color: "#fff",
+      fontWeight: "bold",
+      fontSize: 36,
     },
     profileName: {
       fontSize: 24,

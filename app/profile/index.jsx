@@ -47,9 +47,21 @@ const ProfileScreen = () => {
         >
           <View style={styles.leftOptionSection}>
             {user?.profileImage ? (
-              <Image source={{ uri: user.profileImage }} style={styles.profileImg} />
+              <Image
+                source={{ uri: user.profileImage }}
+                style={styles.profileImg}
+              />
             ) : (
-              <View style={styles.profileImg} />
+              <View
+                style={[
+                  styles.profileImg,
+                  { justifyContent: "center", alignItems: "center" },
+                ]}
+              >
+                <Text style={styles.avatarText}>
+                  {user?.username?.charAt(0).toUpperCase()}
+                </Text>
+              </View>
             )}
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>{user?.email}</Text>
@@ -191,6 +203,11 @@ const getStyles = (colors, theme) =>
       height: 74,
       borderRadius: 37,
       backgroundColor: colors.button,
+    },
+    avatarText: {
+      color: "#fff",
+      fontWeight: "bold",
+      fontSize: 32,
     },
     settingsContainer: {
       marginTop: 22,
