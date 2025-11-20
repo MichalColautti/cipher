@@ -44,7 +44,10 @@ const HomeScreen = () => {
               <View style={styles.profileImg} />
             </TouchableOpacity>
             <Text style={styles.title}>Cipher</Text>
-            <TouchableOpacity style={styles.addButton}>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => router.push("/newChat")}
+            >
               <AddChatIcon width={40} height={40} color={colors.iconStroke} />
             </TouchableOpacity>
           </View>
