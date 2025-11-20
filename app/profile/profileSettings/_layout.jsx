@@ -15,6 +15,18 @@ const ProfileSettingsLayout = () => {
           headerShown: false, 
         }}
       />
+      <Stack.Screen
+        name="notifications"
+        options={{
+          headerShown: false, 
+        }}
+      />
+      <Stack.Screen
+        name="appearance"
+        options={{
+          headerShown: false, 
+        }}
+      />
     </Stack>
   );
 };

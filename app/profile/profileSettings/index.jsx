@@ -4,12 +4,15 @@ import BackIcon from "@/assets/icons/back.svg";
 import EditIcon from "@/assets/icons/edit.svg";
 import ForwardIcon from "@/assets/icons/forward.svg";
 import { useAuth } from "@/contexts/authContext";
+import { useTheme } from "@/contexts/themeContext";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const ProfileSettingsScreen = () => {
   const router = useRouter();
   const { user } = useAuth();
+  const { colors } = useTheme();
+  const styles = getStyles(colors);
 
   return (
     <View style={styles.container}>
@@ -20,7 +23,12 @@ const ProfileSettingsScreen = () => {
             router.back();
           }}
         >
-          <BackIcon width={35} height={25} stroke={"#fff"} />
+          <BackIcon
+            width={35}
+            height={25}
+            color={colors.iconFill}
+            fill={colors.iconFill}
+          />
         </TouchableOpacity>
         <Text style={styles.title}>Profile</Text>
       </View>
@@ -35,7 +43,7 @@ const ProfileSettingsScreen = () => {
       <View style={styles.settingsContainer}>
         <TouchableOpacity style={styles.settingBox}>
           <View style={styles.leftOptionSection}>
-            <AccountIcon width={24} height={24} />
+            <AccountIcon width={24} height={24} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>{user.username}</Text>
             </View>
@@ -47,7 +55,7 @@ const ProfileSettingsScreen = () => {
 
         <TouchableOpacity style={styles.settingBox}>
           <View style={styles.leftOptionSection}>
-            <EditIcon width={24} height={24} fill={"#fff"} />
+            <EditIcon width={24} height={24} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>O mnie</Text>
             </View>
@@ -72,7 +80,7 @@ const ProfileSettingsScreen = () => {
           }
         >
           <View style={styles.leftOptionSection}>
-            <AtIcon width={18} height={18} fill={"#fff"} />
+            <AtIcon width={18} height={18} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>Nazwa użytkownika</Text>
             </View>
@@ -89,97 +97,96 @@ const ProfileSettingsScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#212427",
-    padding: 22,
-  },
-  header: {
-    alignItems: "center",
-    marginTop: 30,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 18,
-  },
-  title: {
-    flex: 1,
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
-    marginRight: 35,
-  },
-  profileImg: {
-    width: 74,
-    height: 74,
-    borderRadius: 37,
-    backgroundColor: "#007bff",
-  },
-  settingsContainer: {
-    marginTop: 22,
-    backgroundColor: "#383D42",
-    borderRadius: 5,
-  },
-  settingBox: {
-    padding: 15,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  nameText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  atText: {
-    color: "#F9F6F0",
-    opacity: 0.7,
-    fontSize: 14,
-  },
-  forwardIcon: {
-    alignContent: "center",
-    justifyContent: "center",
-  },
-  leftOptionSection: {
-    flexDirection: "row",
-    gap: 15,
-    alignItems: "center",
-    flex: 1,
-  },
-  textContainer: {
-    justifyContent: "center",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#F9F6F0",
-    opacity: 0.15,
-    marginLeft: 54,
-  },
-  profileSection: {
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  editPhotoBtn: {
-    marginTop: 10,
-    backgroundColor: "#383D42",
-    borderRadius: 16,
-    paddingHorizontal: 23,
-    paddingVertical: 5,
-  },
-  editPhotoBtnText: {
-    color: "#E3E5E8",
-    fontWeight: "600",
-    fontSize: 15,
-  },
-  subText: {
-    color: "#B9BCC8",
-    fontSize: 13,
-    paddingHorizontal: 26,
-    marginVertical: 15,
-    lineHeight: 17,
-    textAlign: "left",
-  },
-});
+const getStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 22,
+    },
+    header: {
+      alignItems: "center",
+      marginTop: 30,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 18,
+    },
+    title: {
+      flex: 1,
+      fontSize: 32,
+      fontWeight: "bold",
+      color: colors.title,
+      textAlign: "center",
+      marginRight: 35,
+    },
+    profileImg: {
+      width: 74,
+      height: 74,
+      borderRadius: 37,
+      backgroundColor: colors.button,
+    },
+    settingsContainer: {
+      marginTop: 22,
+      backgroundColor: colors.settingsBackground,
+      borderRadius: 5,
+    },
+    settingBox: {
+      padding: 15,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    nameText: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "600",
+    },
+    atText: {
+      color: colors.placeholder,
+      fontSize: 14,
+    },
+    forwardIcon: {
+      alignContent: "center",
+      justifyContent: "center",
+    },
+    leftOptionSection: {
+      flexDirection: "row",
+      gap: 15,
+      alignItems: "center",
+      flex: 1,
+    },
+    textContainer: {
+      justifyContent: "center",
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.divider,
+      marginLeft: 54,
+    },
+    profileSection: {
+      alignItems: "center",
+      marginBottom: 16,
+    },
+    editPhotoBtn: {
+      marginTop: 10,
+      backgroundColor: colors.settingsBackground,
+      borderRadius: 16,
+      paddingHorizontal: 23,
+      paddingVertical: 5,
+    },
+    editPhotoBtnText: {
+      color: colors.text,
+      fontWeight: "600",
+      fontSize: 15,
+    },
+    subText: {
+      color: colors.placeholder,
+      fontSize: 13,
+      paddingHorizontal: 26,
+      marginVertical: 15,
+      lineHeight: 17,
+      textAlign: "left",
+    },
+  });
 
 export default ProfileSettingsScreen;

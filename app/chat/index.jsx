@@ -1,6 +1,7 @@
 import MessageBubble from "@/components/messageBubble";
 import { db } from "@/config/firebaseConfig";
 import { useAuth } from "@/contexts/authContext";
+import { useTheme } from "@/contexts/themeContext";
 import { useRouter } from "expo-router";
 import {
   addDoc,
@@ -31,6 +32,8 @@ import SendIcon from "../../assets/icons/send.svg";
 
 const ChatScreen = () => {
   const { user, loading } = useAuth();
+  const { colors } = useTheme();
+  const styles = getStyles(colors);
   const router = useRouter();
   const [message, setMessage] = useState("");
 
@@ -130,7 +133,7 @@ const ChatScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#212427" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -143,15 +146,28 @@ const ChatScreen = () => {
               style={styles.button}
               onPress={() => router.back()}
             >
-              <BackIcon width={35} height={25} fill={"#fff"} />
+              <BackIcon
+                width={35}
+                height={25}
+                color={colors.iconFill}
+                fill={colors.iconFill}
+              />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.leftHeaderSection} onPress={() => router.push("/chat/callerProfile")}>
+            <TouchableOpacity
+              style={styles.leftHeaderSection}
+              onPress={() => router.push("/chat/callerProfile")}
+            >
               <View style={styles.profileImg} />
               <Text style={styles.title}>Tom Black</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.button}>
-            <CallIcon width={28} height={28} fill={"#fff"} stroke={"#fff"} />
+            <CallIcon
+              width={28}
+              height={28}
+              fill={colors.iconFill}
+              stroke={colors.iconStroke}
+            />
           </TouchableOpacity>
         </View>
 
@@ -192,12 +208,13 @@ const ChatScreen = () => {
         {/* Message input */}
         <View style={styles.inputContainer}>
           <TouchableOpacity style={styles.button}>
-            <AttachmentIcon width={22} height={22} fill="#fff" />
+            <AttachmentIcon width={22} height={22} color={colors.iconFill} />
           </TouchableOpacity>
           <TextInput
             style={styles.input}
             value={message}
             onChangeText={setMessage}
+            placeholderTextColor={colors.placeholder}
           />
           <TouchableOpacity onPress={handleSend} style={styles.button}>
             <SendIcon width={26} height={26} fill="#007bff" />
@@ -208,66 +225,66 @@ const ChatScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#212427",
-  },
-  chatScreen: {
-    flex: 1,
-    backgroundColor: "#131416",
-    paddingHorizontal: 10,
-  },
-  header: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 10,
-    marginHorizontal: 10,
-    marginTop: 10,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-    textAlign: "left",
-  },
-  profileImg: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#007bff",
-    marginRight: 10,
-    marginLeft: 5,
-  },
-  addButton: {
-    color: "#fff",
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingTop: 10,
-    paddingHorizontal: 10,
-  },
-  input: {
-    padding: 8,
-    flex: 1,
-    backgroundColor: "#383D42",
-    color: "#fff",
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    fontSize: 16,
-  },
-  button: {
-    padding: 8,
-  },
-  leftHeaderSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-});
+const getStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    chatScreen: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: 10,
+    },
+    header: {
+      alignItems: "center",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 10,
+      marginHorizontal: 10,
+      marginTop: 10,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: colors.title,
+      textAlign: "left",
+    },
+    profileImg: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.button,
+      marginRight: 10,
+      marginLeft: 5,
+    },
+    addButton: {
+      color: colors.text,
+    },
+    inputContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingTop: 10,
+      paddingHorizontal: 10,
+    },
+    input: {
+      padding: 8,
+      flex: 1,
+      backgroundColor: colors.inputBackground,
+      color: colors.text,
+      borderRadius: 20,
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      fontSize: 16,
+    },
+    button: {
+      padding: 8,
+    },
+    leftHeaderSection: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  });
 
 export default ChatScreen;

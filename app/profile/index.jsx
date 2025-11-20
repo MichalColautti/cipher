@@ -9,12 +9,15 @@ import LinkedDevicesIcon from "@/assets/icons/linkedDevices.svg";
 import NotificationsIcon from "@/assets/icons/notifications.svg";
 import PrivacyIcon from "@/assets/icons/privacy.svg";
 import { useAuth } from "@/contexts/authContext";
+import { useTheme } from "@/contexts/themeContext";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const ProfileScreen = () => {
   const router = useRouter();
   const { user } = useAuth();
+  const { colors } = useTheme();
+  const styles = getStyles(colors);
 
   return (
     <View style={styles.container}>
@@ -25,13 +28,23 @@ const ProfileScreen = () => {
             router.back();
           }}
         >
-          <BackIcon width={35} height={25} stroke={"#fff"} />
+          <BackIcon
+            width={35}
+            height={25}
+            color={colors.iconFill}
+            fill={colors.iconFill}
+          />
         </TouchableOpacity>
         <Text style={styles.title}>Settings</Text>
       </View>
       {/* settings options */}
       <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingBox} onPress={() => {router.push("/profile/profileSettings")}}>
+        <TouchableOpacity
+          style={styles.settingBox}
+          onPress={() => {
+            router.push("/profile/profileSettings");
+          }}
+        >
           <View style={styles.leftOptionSection}>
             <View style={styles.profileImg} />
             <View style={styles.textContainer}>
@@ -46,7 +59,7 @@ const ProfileScreen = () => {
       <View style={styles.settingsContainer}>
         <TouchableOpacity style={styles.settingBox}>
           <View style={styles.leftOptionSection}>
-            <AccountIcon width={24} height={24} />
+            <AccountIcon width={24} height={24} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>Account</Text>
             </View>
@@ -58,7 +71,7 @@ const ProfileScreen = () => {
 
         <TouchableOpacity style={styles.settingBox}>
           <View style={styles.leftOptionSection}>
-            <LinkedDevicesIcon width={24} height={24} />
+            <LinkedDevicesIcon width={24} height={24} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>Linked devices</Text>
             </View>
@@ -70,7 +83,7 @@ const ProfileScreen = () => {
 
         <TouchableOpacity style={styles.settingBox}>
           <View style={styles.leftOptionSection}>
-            <PrivacyIcon width={24} height={24} />
+            <PrivacyIcon width={24} height={24} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>Privacy</Text>
             </View>
@@ -80,9 +93,12 @@ const ProfileScreen = () => {
       </View>
 
       <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingBox}>
+        <TouchableOpacity
+          style={styles.settingBox}
+          onPress={() => router.push("/profile/profileSettings/appearance")}
+        >
           <View style={styles.leftOptionSection}>
-            <AppearanceIcon width={24} height={24} />
+            <AppearanceIcon width={24} height={24} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>Appearance</Text>
             </View>
@@ -92,9 +108,12 @@ const ProfileScreen = () => {
 
         <View style={styles.divider} />
 
-        <TouchableOpacity style={styles.settingBox}>
+        <TouchableOpacity
+          style={styles.settingBox}
+          onPress={() => router.push("/profile/profileSettings/notifications")}
+        >
           <View style={styles.leftOptionSection}>
-            <NotificationsIcon width={24} height={24} />
+            <NotificationsIcon width={24} height={24} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>Notifications</Text>
             </View>
@@ -106,7 +125,7 @@ const ProfileScreen = () => {
 
         <TouchableOpacity style={styles.settingBox}>
           <View style={styles.leftOptionSection}>
-            <DataIcon width={24} height={24} />
+            <DataIcon width={24} height={24} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>Data and Storage</Text>
             </View>
@@ -118,7 +137,7 @@ const ProfileScreen = () => {
       <View style={styles.settingsContainer}>
         <TouchableOpacity style={styles.settingBox}>
           <View style={styles.leftOptionSection}>
-            <HelptIcon width={24} height={24} />
+            <HelptIcon width={24} height={24} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>Help</Text>
             </View>
@@ -130,7 +149,7 @@ const ProfileScreen = () => {
 
         <TouchableOpacity style={styles.settingBox}>
           <View style={styles.leftOptionSection}>
-            <AboutIcon width={24} height={24} />
+            <AboutIcon width={24} height={24} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>About</Text>
             </View>
@@ -142,72 +161,71 @@ const ProfileScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#212427",
-    padding: 22,
-  },
-  header: {
-    alignItems: "center",
-    marginTop: 30,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  title: {
-    flex: 1,
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
-    marginRight: 35,
-  },
-  profileImg: {
-    width: 74,
-    height: 74,
-    borderRadius: 37,
-    backgroundColor: "#007bff",
-  },
-  settingsContainer: {
-    marginTop: 22,
-    backgroundColor: "#383D42",
-    borderRadius: 5,
-  },
-  settingBox: {
-    padding: 15,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  nameText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  atText: {
-    color: "#F9F6F0",
-    opacity: 0.7,
-    fontSize: 14,
-  },
-  forwardIcon: {
-    alignContent: "center",
-    justifyContent: "center",
-  },
-  leftOptionSection: {
-    flexDirection: "row",
-    gap: 15,
-    alignItems: "center",
-    flex: 1,
-  },
-  textContainer: {
-    justifyContent: "center",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#F9F6F0",
-    opacity: 0.15,
-    marginLeft: 54,
-  },
-});
+const getStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 22,
+    },
+    header: {
+      alignItems: "center",
+      marginTop: 30,
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    title: {
+      flex: 1,
+      fontSize: 32,
+      fontWeight: "bold",
+      color: colors.title,
+      textAlign: "center",
+      marginRight: 35,
+    },
+    profileImg: {
+      width: 74,
+      height: 74,
+      borderRadius: 37,
+      backgroundColor: colors.button,
+    },
+    settingsContainer: {
+      marginTop: 22,
+      backgroundColor: colors.settingsBackground,
+      borderRadius: 5,
+    },
+    settingBox: {
+      padding: 15,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    nameText: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "600",
+    },
+    atText: {
+      color: colors.placeholder,
+      fontSize: 14,
+    },
+    forwardIcon: {
+      alignContent: "center",
+      justifyContent: "center",
+    },
+    leftOptionSection: {
+      flexDirection: "row",
+      gap: 15,
+      alignItems: "center",
+      flex: 1,
+    },
+    textContainer: {
+      justifyContent: "center",
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.divider,
+      marginLeft: 54,
+    },
+  });
 
 export default ProfileScreen;
