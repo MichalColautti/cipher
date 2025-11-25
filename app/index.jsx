@@ -61,6 +61,7 @@ const HomeScreen = () => {
       pathname: "/chat",
       params: {
         roomId,
+        contactId: otherUser.id, 
         contactName: otherUser.username,
         contactImage: otherUser.profileImage,
       },
