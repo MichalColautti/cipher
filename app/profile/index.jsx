@@ -93,7 +93,12 @@ const ProfileScreen = () => {
 
           <View style={styles.divider} />
 
-          <TouchableOpacity style={styles.settingBox}>
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() => {
+              router.push("/profile/linkedDevices");
+            }}
+          >
             <View style={styles.leftOptionSection}>
               <LinkedDevicesIcon
                 width={24}
