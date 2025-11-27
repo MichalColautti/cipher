@@ -174,7 +174,10 @@ const ProfileScreen = () => {
         </View>
 
         <View style={styles.settingsContainer}>
-          <TouchableOpacity style={styles.settingBox}>
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() => router.push("/profile/help")}
+          >
             <View style={styles.leftOptionSection}>
               <HelptIcon width={24} height={24} color={colors.iconFill} />
               <View style={styles.textContainer}>
