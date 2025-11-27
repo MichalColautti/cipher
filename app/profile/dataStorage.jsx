@@ -1,13 +1,47 @@
 import BackIcon from "@/assets/icons/back.svg";
+import ForwardIcon from "@/assets/icons/forward.svg";
 import { useTheme } from "@/contexts/themeContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import {
+    ActivityIndicator,
+    Alert,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
 const DataStorageScreen = () => {
   const router = useRouter();
   const { theme, colors } = useTheme();
   const styles = getStyles(colors, theme);
+
+  // States for auto-download settings
+  const [wifiDownload, setWifiDownload] = useState("...");
+  const [cellularDownload, setCellularDownload] = useState("...");
+  const [loading, setLoading] = useState(false);
+
+  // Load settings when the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      const loadSettings = async () => {
+        try {
+          const wifiSetting = await AsyncStorage.getItem("autoDownload_wifi");
+          const cellularSetting = await AsyncStorage.getItem(
+            "autoDownload_cellular"
+          );
+          setWifiDownload(wifiSetting || "All Media"); // Default to 'All Media'
+          setCellularDownload(cellularSetting || "Photos"); // Default to 'Photos'
+        } catch (error) {
+          console.error("Failed to load auto-download settings:", error);
+        }
+      };
+      loadSettings();
+    }, [])
+  );
 
   const handleClearCache = () => {
     Alert.alert(
@@ -22,6 +56,7 @@ const DataStorageScreen = () => {
           text: "Clear",
           style: "destructive",
           onPress: async () => {
+            setLoading(true);
             try {
               await Image.clearDiskCache();
               await Image.clearMemoryCache();
@@ -32,6 +67,8 @@ const DataStorageScreen = () => {
                 "Error",
                 "An error occurred while clearing the cache."
               );
+            } finally {
+              setLoading(false);
             }
           },
         },
@@ -49,11 +86,53 @@ const DataStorageScreen = () => {
         <View style={{ width: 35 }} />
       </View>
 
-      <Text style={styles.sectionTitle}>MANAGE STORAGE</Text>
+      <Text style={styles.sectionTitle}>Manage storage</Text>
       <View style={styles.settingsContainer}>
         <TouchableOpacity style={styles.settingBox} onPress={handleClearCache}>
-          <View style={styles.textContainer}>
-            <Text style={styles.nameText}>Clear Cache</Text>
+          <Text style={styles.nameText}>Clear Cache</Text>
+          {loading && <ActivityIndicator size="small" color={colors.text} />}
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.sectionTitle}>Media auto download</Text>
+      <View style={styles.settingsContainer}>
+        <TouchableOpacity
+          style={styles.settingBox}
+          onPress={() =>
+            router.push({
+              pathname: "/profile/autoDownloadSettings",
+              params: { settingType: "wifi", currentValue: wifiDownload, title: "When using Wi-Fi" },
+            })
+          }
+        >
+          <Text style={styles.nameText}>When using Wi-Fi</Text>
+          <View style={styles.rightOptionSection}>
+            <Text style={styles.optionValueText}>{wifiDownload}</Text>
+            <ForwardIcon
+              style={{ opacity: 0.29, marginLeft: 5 }}
+              width={18}
+              height={24}
+            />
+          </View>
+        </TouchableOpacity>
+        <View style={styles.divider} />
+        <TouchableOpacity
+          style={styles.settingBox}
+          onPress={() =>
+            router.push({
+              pathname: "/profile/autoDownloadSettings",
+              params: { settingType: "cellular", currentValue: cellularDownload, title: "When using Cellular" },
+            })
+          }
+        >
+          <Text style={styles.nameText}>When using Cellular</Text>
+          <View style={styles.rightOptionSection}>
+            <Text style={styles.optionValueText}>{cellularDownload}</Text>
+            <ForwardIcon
+              style={{ opacity: 0.29, marginLeft: 5 }}
+              width={18}
+              height={24}
+            />
           </View>
         </TouchableOpacity>
       </View>
@@ -120,6 +199,20 @@ const getStyles = (colors, theme) =>
     textContainer: {
       justifyContent: "center",
     },
+    rightOptionSection: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    optionValueText: {
+      color: colors.placeholder,
+      fontSize: 16,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.divider,
+      marginLeft: 15,
+    },
   });
+
 
 export default DataStorageScreen;
