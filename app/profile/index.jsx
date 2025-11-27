@@ -162,7 +162,10 @@ const ProfileScreen = () => {
 
           <View style={styles.divider} />
 
-          <TouchableOpacity style={styles.settingBox}>
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() => router.push("/profile/dataStorage")}
+          >
             <View style={styles.leftOptionSection}>
               <DataIcon width={24} height={24} color={colors.iconFill} />
               <View style={styles.textContainer}>
