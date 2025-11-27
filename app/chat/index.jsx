@@ -251,7 +251,7 @@ const getStyles = (colors) =>
     },
     chatScreen: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.chatBackground,
       paddingHorizontal: 10,
     },
     header: {
