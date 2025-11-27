@@ -1,12 +1,20 @@
-import { db } from "@/config/firebaseConfig";
+import { auth, db } from "@/config/firebaseConfig";
+import {
+  deleteUser,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updateEmail,
+} from "firebase/auth";
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { Alert } from "react-native";
@@ -103,4 +111,52 @@ export const getMyFriends = async (userId) => {
   const friends = await Promise.all(friendPromises);
 
   return friends.filter((friend) => friend !== null);
+};
+
+export const updateUserEmail = async (
+  currentEmail,
+  password,
+  newEmail,
+  userId
+) => {
+  const currentUser = auth.currentUser;
+  if (!currentUser) throw new Error("User not found for re-authentication.");
+
+  const credential = EmailAuthProvider.credential(currentEmail, password);
+  await reauthenticateWithCredential(currentUser, credential);
+
+  await updateEmail(currentUser, newEmail);
+
+  const userRef = doc(db, "users", userId);
+  await updateDoc(userRef, { email: newEmail });
+};
+
+export const deleteUserAccount = async (userId, password) => {
+  const currentUser = auth.currentUser;
+  if (!currentUser || currentUser.uid !== userId) {
+    throw new Error("User is not authenticated or does not match.");
+  }
+
+  if (currentUser.email && password) {
+    const credential = EmailAuthProvider.credential(
+      currentUser.email,
+      password
+    );
+    await reauthenticateWithCredential(currentUser, credential);
+  }
+
+  // Delete all subcollections
+  const subcollections = ["sessions", "friends"];
+
+  for (const subName of subcollections) {
+    const subRef = collection(db, "users", userId, subName);
+    const subSnapshot = await getDocs(subRef);
+    for (const doc of subSnapshot.docs) {
+      await deleteDoc(doc.ref);
+    }
+  }
+
+  await deleteDoc(doc(db, "users", userId));
+
+  await deleteUser(currentUser);
 };
