@@ -117,7 +117,10 @@ const ProfileScreen = () => {
 
           <View style={styles.divider} />
 
-          <TouchableOpacity style={styles.settingBox}>
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() => router.push("/profile/privacy")}
+          >
             <View style={styles.leftOptionSection}>
               <PrivacyIcon width={24} height={24} color={colors.iconFill} />
               <View style={styles.textContainer}>
