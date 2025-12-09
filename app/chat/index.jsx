@@ -4,6 +4,8 @@ import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
+  doc,
+  setDoc,
   addDoc,
   collection,
   onSnapshot,
@@ -96,16 +98,24 @@ const ChatScreen = () => {
   // MESSAGE SENDING
   const handleSend = async () => {
     if (message.trim()) {
+      const textToSend = message.trim();
       try {
         // The same reference as in the listener
         const messagesRef = collection(db, "chats", chatRoomId, "messages");
 
         // Add new document (message) to Firestore
         await addDoc(messagesRef, {
-          text: message.trim(),
+          text: textToSend,
           senderId: myId, // Logged user id form AuthContext
           createdAt: serverTimestamp(), // Timestamp from the server
         });
+
+        const roomRef = doc(db, "chats", chatRoomId);
+        await setDoc(roomRef, {
+          lastMessage: textToSend,
+          lastMessageTimestamp: serverTimestamp(),
+          participants: [myId, chatRoomId.replace(myId, "").replace("_", "")] // Both participants
+        }, { merge: true }); // Merge not to overwrite other fields
 
         setMessage(""); // Clear input
 
