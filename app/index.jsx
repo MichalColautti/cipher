@@ -2,6 +2,8 @@ import ChatItem from "@/components/chatItem";
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
 import { getMyFriends } from "@/services/userService";
+import { db } from "@/config/firebaseConfig";
+import { doc, onSnapshot } from "firebase/firestore";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
@@ -125,20 +127,68 @@ const HomeScreen = () => {
           {/* chat list */}
           <ScrollView>
             <Text style={styles.subtitle}>Chats</Text>
-            {friends.map((friend) => (
-              <ChatItem
-                key={friend.id}
-                name={friend.username}
-                message="Tap to start a conversation"
-                time="now"
-                imageUri={friend.profileImage}
-                onPress={() => openChat(friend)}
-              />
-            ))}
+              {friends.length === 0 && (
+                <Text style={{ color: colors.placeholder, textAlign: 'center', marginTop: 20 }}>
+                  No chats yet. Click + to start.
+                </Text>
+              )}
+              {friends.map((friend) => (
+                <LiveChatItem
+                  key={friend.id}
+                  friend={friend}
+                  currentUser={user}
+                  onPress={() => openChat(friend)}
+                  getChatRoomId={getChatRoomId}
+                />
+              ))}
           </ScrollView>
         </View>
       ) : null}
     </View>
+  );
+};
+
+const LiveChatItem = ({ friend, currentUser, onPress, getChatRoomId }) => {
+  const [lastMsg, setLastMsg] = useState("Tap to start conversation");
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const myId = currentUser.id || currentUser.uid;
+    const roomId = getChatRoomId(myId, friend.id);
+    const roomRef = doc(db, "chats", roomId);
+
+    // Listen for real-time updates in the chat room document
+    const unsubscribe = onSnapshot(roomRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.lastMessage) {
+          setLastMsg(data.lastMessage);
+        }
+        if (data.lastMessageTimestamp) {
+          // Fast formatting of timestamp
+          const date = data.lastMessageTimestamp.toDate();
+          const now = new Date();
+          // If today, show time, else show date
+          if (date.toDateString() === now.toDateString()) {
+            setTime(date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+          } else {
+            setTime(date.toLocaleDateString());
+          }
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [friend, currentUser]);
+
+  return (
+    <ChatItem
+      name={friend.username}
+      message={lastMsg}
+      time={time}
+      imageUri={friend.profileImage}
+      onPress={onPress}
+    />
   );
 };
 
