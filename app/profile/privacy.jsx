@@ -5,12 +5,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    Alert,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const PRIVACY_PREVIEW_KEY = "privacy_show_preview";
@@ -50,7 +50,7 @@ const PrivacyScreen = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <BackIcon width={35} height={25} color={colors.iconFill} />
+          <BackIcon width={35} height={25} color={colors.iconFill} fill={colors.iconFill} />
         </TouchableOpacity>
         <Text style={styles.title}>Privacy</Text>
         <View style={{ width: 35 }} />

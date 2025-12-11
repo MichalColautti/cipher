@@ -6,8 +6,6 @@ import {
   lightThemeColors,
   useTheme,
 } from "@/contexts/themeContext";
-import MoonIcon from "@/assets/icons/moon.svg";
-import SunIcon from "@/assets/icons/sun.svg";
 
 import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -62,7 +60,7 @@ const AppearanceScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <BackIcon width={35} height={25} color={colors.iconFill} />
+          <BackIcon width={35} height={25} color={colors.iconFill} fill={colors.iconFill} />
         </TouchableOpacity>
         <Text style={styles.title}>Appearance</Text>
         <View style={{ width: 35 }} />

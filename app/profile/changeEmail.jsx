@@ -5,13 +5,13 @@ import { updateUserEmail } from "@/services/userService";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const ChangeEmailScreen = () => {
@@ -55,7 +55,7 @@ const ChangeEmailScreen = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <BackIcon width={35} height={25} color={colors.iconFill} />
+          <BackIcon width={35} height={25} color={colors.iconFill} fill={colors.iconFill} />
         </TouchableOpacity>
         <Text style={styles.title}>Change Email</Text>
         <View style={{ width: 35 }} />

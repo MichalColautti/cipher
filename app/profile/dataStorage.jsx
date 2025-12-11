@@ -6,12 +6,12 @@ import { Image } from "expo-image";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const DataStorageScreen = () => {
@@ -80,7 +80,7 @@ const DataStorageScreen = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <BackIcon width={35} height={25} color={colors.iconFill} />
+          <BackIcon width={35} height={25} color={colors.iconFill} fill={colors.iconFill} />
         </TouchableOpacity>
         <Text style={styles.title}>Data and Storage</Text>
         <View style={{ width: 35 }} />

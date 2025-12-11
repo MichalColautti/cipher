@@ -60,30 +60,19 @@ const ProfileScreen = () => {
                   style={styles.profileImg}
                 />
               ) : (
-                <View
-                  style={[
-                    styles.profileImg,
-                    { justifyContent: "center", alignItems: "center" },
-                  ]}
-                >
-                  <Text style={styles.avatarText}>
-                    {user?.username?.charAt(0).toUpperCase()}
-                  </Text>
+                <View style={[styles.profileImg, { justifyContent: "center", alignItems: "center" }]}>
+                  <Text style={styles.avatarText}>{user?.username?.charAt(0).toUpperCase()}</Text>
                 </View>
               )}
+              
               <View style={styles.textContainer}>
-                <Text style={styles.nameText}>{user?.email}</Text>
+                <Text style={styles.nameText}>{user?.nickname || user?.username}</Text>
                 <Text style={styles.atText}>@{user?.username}</Text>
               </View>
-            )}
-            <View style={styles.textContainer}>
-              <Text style={styles.nameText}>{user?.nickname || user?.username}</Text>
-              <Text style={styles.atText}>@{user?.username}</Text>
             </View>
-          </View>
-          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
-        </TouchableOpacity>
-      </View>
+            <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.settingsContainer}>
           <TouchableOpacity
@@ -96,7 +85,6 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Account</Text>
               </View>
             </View>
-          </View>
           <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
 
@@ -118,7 +106,6 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Linked devices</Text>
               </View>
             </View>
-          </View>
           <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
 
@@ -134,7 +121,6 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Privacy</Text>
               </View>
             </View>
-          </View>
           <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
       </View>
@@ -150,7 +136,6 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Appearance</Text>
               </View>
             </View>
-          </View>
           <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
 
@@ -172,7 +157,6 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Notifications</Text>
               </View>
             </View>
-          </View>
           <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
 
@@ -188,7 +172,6 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Data and Storage</Text>
               </View>
             </View>
-          </View>
           <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
       </View>
@@ -204,7 +187,6 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Help</Text>
               </View>
             </View>
-          </View>
           <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
 
