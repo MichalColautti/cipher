@@ -75,10 +75,15 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>{user?.email}</Text>
                 <Text style={styles.atText}>@{user?.username}</Text>
               </View>
+            )}
+            <View style={styles.textContainer}>
+              <Text style={styles.nameText}>{user?.nickname || user?.username}</Text>
+              <Text style={styles.atText}>@{user?.username}</Text>
             </View>
-            <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
-          </TouchableOpacity>
-        </View>
+          </View>
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+        </TouchableOpacity>
+      </View>
 
         <View style={styles.settingsContainer}>
           <TouchableOpacity
@@ -91,8 +96,9 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Account</Text>
               </View>
             </View>
-            <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
-          </TouchableOpacity>
+          </View>
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+        </TouchableOpacity>
 
           <View style={styles.divider} />
 
@@ -112,8 +118,9 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Linked devices</Text>
               </View>
             </View>
-            <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
-          </TouchableOpacity>
+          </View>
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+        </TouchableOpacity>
 
           <View style={styles.divider} />
 
@@ -127,9 +134,10 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Privacy</Text>
               </View>
             </View>
-            <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
-          </TouchableOpacity>
-        </View>
+          </View>
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+        </TouchableOpacity>
+      </View>
 
         <View style={styles.settingsContainer}>
           <TouchableOpacity
@@ -142,8 +150,9 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Appearance</Text>
               </View>
             </View>
-            <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
-          </TouchableOpacity>
+          </View>
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+        </TouchableOpacity>
 
           <View style={styles.divider} />
 
@@ -163,8 +172,9 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Notifications</Text>
               </View>
             </View>
-            <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
-          </TouchableOpacity>
+          </View>
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+        </TouchableOpacity>
 
           <View style={styles.divider} />
 
@@ -178,9 +188,10 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Data and Storage</Text>
               </View>
             </View>
-            <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
-          </TouchableOpacity>
-        </View>
+          </View>
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+        </TouchableOpacity>
+      </View>
 
         <View style={styles.settingsContainer}>
           <TouchableOpacity
@@ -193,8 +204,9 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>Help</Text>
               </View>
             </View>
-            <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
-          </TouchableOpacity>
+          </View>
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+        </TouchableOpacity>
 
           <View style={styles.divider} />
 
@@ -208,7 +220,7 @@ const ProfileScreen = () => {
                 <Text style={styles.nameText}>About</Text>
               </View>
             </View>
-            <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+            <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
           </TouchableOpacity>
         </View>
 
@@ -237,7 +249,7 @@ const getStyles = (colors, theme) =>
     },
     title: {
       flex: 1,
-      fontSize: 32,
+      fontSize: 24,
       fontWeight: "bold",
       color: colors.title,
       textAlign: "center",
@@ -280,11 +292,13 @@ const getStyles = (colors, theme) =>
     nameText: {
       color: colors.text,
       fontSize: 18,
+      lineHeight: 24,
       fontWeight: "600",
     },
     atText: {
       color: colors.placeholder,
       fontSize: 14,
+      lineHeight: 18,
     },
     forwardIcon: {
       alignContent: "center",

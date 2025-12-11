@@ -30,16 +30,19 @@ const CallerProfileScreen = () => {
   const { theme, colors } = useTheme();
   const styles = getStyles(colors, theme);
 
+  const displayName = params.nickname || params.name || "Contact";
+  const displayHandle = params.username || "";
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <BackIcon width={35} height={25} color={colors.iconStroke} />
+          <BackIcon width={35} height={25} color={colors.iconStroke} fill={colors.iconFill} />
         </TouchableOpacity>
       </View>
 
-      {/* Customization */}
+      {/* Friend's profile */}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.profileSection}>
           {params.image ? (
@@ -56,9 +59,12 @@ const CallerProfileScreen = () => {
               </Text>
             </View>
           )}
-          <Text style={styles.profileName}>{params.name || "Contact"}</Text>
+          <Text style={styles.profileName}>{displayName}</Text>
+
+          <Text style={styles.profileHandle}>@{displayHandle}</Text>
         </View>
 
+        {/* Customization */}
         <Text style={styles.sectionLabel}>Customization</Text>
         <View style={styles.settingsContainer}>
           <TouchableOpacity style={styles.settingBox}>
@@ -73,7 +79,7 @@ const CallerProfileScreen = () => {
             <ColorIcon width={22} height={22} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>
-                Color and conversation background
+                Conversation screen
               </Text>
             </View>
             <ForwardIcon width={18} height={20} style={styles.forwardIcon} />
@@ -87,7 +93,7 @@ const CallerProfileScreen = () => {
             <GroupIcon width={22} height={22} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText} numberOfLines={1}>
-                Create a groupchat with {params.name || "Contact"}
+                Create a groupchat
               </Text>
             </View>
             <ForwardIcon width={18} height={20} style={styles.forwardIcon} />
@@ -101,7 +107,20 @@ const CallerProfileScreen = () => {
             <ForwardIcon width={18} height={20} style={styles.forwardIcon} />
           </TouchableOpacity>
           <View style={styles.divider} />
-          <TouchableOpacity style={styles.settingBox}>
+          <TouchableOpacity 
+            style={styles.settingBox}
+            onPress={() => {
+              router.push({
+                pathname: "/chat",
+                params: {
+                  roomId: params.roomId,
+                  contactName: params.name,
+                  contactImage: params.image,
+                  triggerSearch: 'true'
+                }
+              });
+            }}
+          >
             <SearchIcon width={22} height={22} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>Search in conversation</Text>
@@ -141,7 +160,7 @@ const CallerProfileScreen = () => {
             <ForwardIcon width={18} height={20} style={styles.forwardIcon} />
           </TouchableOpacity>
           <View style={styles.divider} />
-          <TouchableOpacity style={[styles.settingBox, { marginTop: 5 }]}>
+          <TouchableOpacity style={[styles.settingBox]}>
             <BlockIcon width={22} height={22} color={"#DC2626"} />
             <View style={styles.textContainer}>
               <Text style={[styles.nameText, { color: "#DC2626" }]}>
@@ -169,15 +188,14 @@ const getStyles = (colors, theme) =>
     container: {
       flex: 1,
       backgroundColor: colors.background,
-      paddingHorizontal: 0,
-      paddingTop: 0,
+      padding: 22,
     },
     header: {
       alignItems: "center",
       flexDirection: "row",
-      marginTop: 60,
+      marginTop: 40,
       marginBottom: 10,
-      marginLeft: 6,
+      marginLeft: 0,
     },
     profileImg: {
       width: 88,
@@ -197,6 +215,14 @@ const getStyles = (colors, theme) =>
       color: colors.title,
       textAlign: "center",
     },
+    profileHandle: {
+      marginTop: 2,
+      color: colors.placeholder,
+      fontSize: 14,
+      fontWeight: "600",
+      letterSpacing: 0.6,
+      textAlign: "center",
+    },
     profileSection: {
       alignItems: "center",
       marginBottom: 16,
@@ -210,8 +236,8 @@ const getStyles = (colors, theme) =>
     },
     sectionLabel: {
       marginTop: 28,
-      marginBottom: 6,
-      marginLeft: 26,
+      marginBottom: 8,
+      marginLeft: 4,
       color: colors.placeholder,
       fontSize: 14,
       fontWeight: "600",
@@ -220,7 +246,7 @@ const getStyles = (colors, theme) =>
     settingsContainer: {
       backgroundColor: colors.settingsBackground,
       borderRadius: 8,
-      marginHorizontal: 13,
+      marginHorizontal: 0,
       marginBottom: 0,
       ...(theme === "light" && {
         borderWidth: 1,
@@ -256,10 +282,12 @@ const getStyles = (colors, theme) =>
     },
     textContainer: {
       justifyContent: "center",
+      flex: 1,
+      paddingRight: 10,
     },
     forwardIcon: {
       marginLeft: "auto",
-      opacity: 0.29,
+      opacity: 0.4,
     },
   });
 
