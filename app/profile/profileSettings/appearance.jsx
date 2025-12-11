@@ -1,5 +1,8 @@
 import BackIcon from "@/assets/icons/back.svg";
 import CheckIcon from "@/assets/icons/check.svg";
+import MoonIcon from "@/assets/icons/moon.svg";
+import SunIcon from "@/assets/icons/sun.svg";
+
 import { useTheme } from "@/contexts/themeContext";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -25,21 +28,31 @@ const AppearanceScreen = () => {
       </View>
 
       <View style={styles.settingsContainer}>
+        {/* LIGHT MODE */}
         <TouchableOpacity
           style={styles.settingBox}
           onPress={() => toggleTheme("light")}
         >
-          <Text style={styles.nameText}>Light</Text>
+          <View style={styles.leftOptionSection}>
+            <SunIcon width={24} height={24} color={colors.iconFill} fill={colors.iconFill} />
+            <Text style={styles.nameText}>Light</Text>
+          </View>
           {theme === "light" && (
             <CheckIcon width={24} height={24} color={colors.iconFill} />
           )}
         </TouchableOpacity>
+
         <View style={styles.divider} />
+
+        {/* DARK MODE */}
         <TouchableOpacity
           style={styles.settingBox}
           onPress={() => toggleTheme("dark")}
         >
-          <Text style={styles.nameText}>Dark</Text>
+          <View style={styles.leftOptionSection}>
+            <MoonIcon width={24} height={24} color={colors.iconFill} fill={colors.iconFill} />
+            <Text style={styles.nameText}>Dark</Text>
+          </View>
           {theme === "dark" && (
             <CheckIcon width={24} height={24} color={colors.iconFill} />
           )}
@@ -65,7 +78,7 @@ const getStyles = (colors, theme) =>
     },
     title: {
       flex: 1,
-      fontSize: 32,
+      fontSize: 24,
       fontWeight: "bold",
       color: colors.title,
       textAlign: "center",
@@ -94,6 +107,11 @@ const getStyles = (colors, theme) =>
       alignItems: "center",
       justifyContent: "space-between",
     },
+    leftOptionSection: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 15,
+    },
     nameText: {
       color: colors.text,
       fontSize: 18,
@@ -102,7 +120,7 @@ const getStyles = (colors, theme) =>
     divider: {
       height: 1,
       backgroundColor: colors.divider,
-      marginLeft: 15,
+      marginLeft: 54,
     },
   });
 

@@ -25,7 +25,7 @@ const EditUsernameScreen = () => {
 
   const handleSave = async () => {
     if (username.length < 3) {
-      Alert.alert("Error", "Username needs to be at least 3 characters long.");
+      Alert.alert("Error", "Cipher tag needs to be at least 3 characters long.");
       return;
     }
 
@@ -34,11 +34,11 @@ const EditUsernameScreen = () => {
       if (!success) return;
 
       updateUserContext({ username: username });
-      Alert.alert("Succes", "Username updated successfully.");
+      Alert.alert("Succes", "Cipher tag updated successfully.");
       router.back();
     } catch (error) {
       console.error("Error:", error);
-      Alert.alert("Error", "Couldn't update username.");
+      Alert.alert("Error", "Couldn't update cipher tag.");
     }
   };
 
@@ -47,9 +47,9 @@ const EditUsernameScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <BackIcon width={35} height={25} color={colors.iconStroke} />
+          <BackIcon width={35} height={25} color={colors.iconStroke} fill={colors.iconFill} />
         </TouchableOpacity>
-        <Text style={styles.title}>Username</Text>
+        <Text style={styles.title}>Cipher tag</Text>
       </View>
 
       {/* Input Field */}
@@ -59,7 +59,7 @@ const EditUsernameScreen = () => {
           style={styles.input}
           value={username}
           onChangeText={setUsername}
-          placeholder="Twoja nazwa użytkownika"
+          placeholder="Cipher tag"
           placeholderTextColor={colors.placeholder}
           autoCapitalize="none"
           autoFocus={true}
@@ -90,14 +90,14 @@ const getStyles = (colors, theme) =>
     },
     title: {
       flex: 1,
-      fontSize: 32,
+      fontSize: 24,
       fontWeight: "bold",
       color: colors.title,
       textAlign: "center",
       marginRight: 35,
     },
     saveButton: {
-      backgroundColor: colors.button,
+      backgroundColor: "#648BCE",
       fontSize: 18,
       fontWeight: "600",
       padding: 15,

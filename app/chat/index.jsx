@@ -52,6 +52,8 @@ const ChatScreen = () => {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchText, setSearchText] = useState("");
 
+  const [otherUserProfile, setOtherUserProfile] = useState(null);
+
   const scrollViewRef = useRef(null);
   
   const triggerSearch = params.triggerSearch;
@@ -89,6 +91,26 @@ const ChatScreen = () => {
 
     return () => unsubscribe();
   }, [user, chatRoomId]);
+
+  useEffect(() => {
+    if (!chatRoomId || !myId) return;
+
+    // Extract other user ID from chatRoomId
+    const otherUserId = chatRoomId.replace(myId, "").replace("_", "");
+
+    if (!otherUserId) return;
+
+    const userRef = doc(db, "users", otherUserId);
+
+    // Use onSnapshot for real-time updates
+    const unsubscribe = onSnapshot(userRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setOtherUserProfile(docSnap.data());
+      }
+    });
+
+    return () => unsubscribe();
+  }, [chatRoomId, myId]);
 
   if (loading) {
     return (
@@ -190,6 +212,34 @@ const ChatScreen = () => {
     });
   };
 
+  const getDateLabel = (timestamp) => {
+    if (!timestamp) return "Today"; // For messages sent now
+
+    const date = timestamp.toDate();
+    const now = new Date();
+
+    // Removing time part for accurate day comparison
+    const dateWithoutTime = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const todayWithoutTime = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // Calculating difference in days
+    const diffTime = todayWithoutTime - dateWithoutTime;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return "Today";
+    } else if (diffDays === 1) {
+      return "Yesterday";
+    } else {
+      // Format: DD.MM.YYYY
+      return date.toLocaleDateString("pl-PL", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+    }
+  };
+
   // Filtering (local search)
   const displayedMessages = isSearchActive
     ? messages.filter(m => m.text && m.text.toLowerCase().includes(searchText.toLowerCase()))
@@ -200,7 +250,7 @@ const ChatScreen = () => {
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -213,7 +263,14 @@ const ChatScreen = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.leftHeaderSection}
-                  onPress={() => router.push({ pathname: "/chat/callerProfile", params: { roomId: chatRoomId, name: contactName, image: contactImage } })}
+                  onPress={() => router.push({
+                    pathname: "/chat/callerProfile", params: {
+                      roomId: chatRoomId, name: otherUserProfile?.username || contactName,
+                      image: otherUserProfile?.profileImage || contactImage,
+                      username: otherUserProfile?.username,
+                      nickname: otherUserProfile?.nickname, 
+                    }
+                  })}
                 >
                   {contactImage ? (
                     <Image source={{ uri: contactImage }} style={styles.profileImg} />
@@ -222,7 +279,7 @@ const ChatScreen = () => {
                       <Text style={styles.avatarText}>{contactName?.charAt(0).toUpperCase()}</Text>
                     </View>
                   )}
-                  <Text style={styles.title}>{contactName}</Text>
+                  <Text style={styles.title}>{otherUserProfile?.nickname || otherUserProfile?.username}</Text>
                 </TouchableOpacity>
               </View>
 
@@ -236,10 +293,10 @@ const ChatScreen = () => {
           ) : (
             // Search header, hidden by default
             <View style={styles.searchHeader}>
-              <SearchIcon width={20} height={20} color={colors.placeholder} />
+              <SearchIcon width={20} height={20} color={colors.placeholder} opacity={0.7}/>
               <TextInput
                 style={[styles.searchInput, { color: colors.text }]}
-                placeholder="Search..."
+                placeholder="Search messages"
                 placeholderTextColor={colors.placeholder}
                 value={searchText}
                 onChangeText={setSearchText}
@@ -262,17 +319,33 @@ const ChatScreen = () => {
         >
           {displayedMessages.map((msg, index) => {
             const isOwn = msg.senderId === myId;
-            const isFirstInGroup = index === 0 || messages[index - 1].senderId !== msg.senderId;
+            const isFirstInGroup = index === 0 || displayedMessages[index - 1].senderId !== msg.senderId;
+
+            // Calculate date labels
+            const currentDateLabel = getDateLabel(msg.createdAt);
+
+            // Check previous message. If it is missing (index 0) or has different date -> display date label
+            const prevDateLabel = index > 0 ? getDateLabel(displayedMessages[index - 1].createdAt) : null;
+            const showDateHeader = currentDateLabel !== prevDateLabel;
 
             return (
-              <MessageBubble
-                key={msg.id}
-                text={msg.text}
-                image={msg.image}
-                time={formatTime(msg.createdAt)}
-                isOwnMessage={isOwn}
-                isFirstInGroup={isFirstInGroup}
-              />
+              <View key={msg.id}>
+                {showDateHeader && (
+                  <View style={styles.dateHeaderContainer}>
+                    <Text style={styles.dateHeaderText}>{currentDateLabel}</Text>
+                  </View>
+                )}
+
+                <View style={{ marginTop: (showDateHeader && isFirstInGroup) ? -15 : 0 }}>
+                  <MessageBubble
+                    text={msg.text}
+                    image={msg.image}
+                    time={formatTime(msg.createdAt)}
+                    isOwnMessage={isOwn}
+                    isFirstInGroup={isFirstInGroup}
+                  />
+                </View>
+              </View>
             );
           })}
           {/* Spinner while photo is uploading */}
@@ -293,6 +366,7 @@ const ChatScreen = () => {
               style={styles.input}
               value={message}
               onChangeText={setMessage}
+              placeholder="Message"
               placeholderTextColor={colors.placeholder}
             />
             <TouchableOpacity onPress={handleSendText} style={styles.button}>
@@ -314,14 +388,14 @@ const getStyles = (colors) =>
     chatScreen: {
       flex: 1,
       backgroundColor: colors.background,
-      paddingHorizontal: 10,
+      paddingHorizontal: 0,
     },
     header: {
       alignItems: "center",
       flexDirection: "row",
       justifyContent: "space-between",
       marginBottom: 10,
-      marginHorizontal: 10,
+      marginHorizontal: 14,
       marginTop: 10,
     },
     searchHeader: {
@@ -329,17 +403,18 @@ const getStyles = (colors) =>
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: colors.inputBackground,
-      borderRadius: 20,
-      paddingHorizontal: 10,
-      height: 40,
+      borderRadius: 8,
+      padding: 10,
+      marginHorizontal: 8,
     },
     searchInput: {
       flex: 1,
       marginLeft: 10,
-      fontSize: 16,
+      color: colors.text,
     },
     title: {
-      fontSize: 24,
+      fontSize: 18,
+      marginLeft: 5,
       fontWeight: "bold",
       color: colors.title,
       textAlign: "left",
@@ -375,6 +450,7 @@ const getStyles = (colors) =>
       paddingVertical: 8,
       paddingHorizontal: 16,
       fontSize: 16,
+      marginHorizontal: 5,
     },
     button: {
       padding: 8,
@@ -383,6 +459,21 @@ const getStyles = (colors) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
+    },
+    dateHeaderContainer: {
+      alignItems: "center",
+      marginVertical: 10,
+      marginBottom: 5,
+    },
+    dateHeaderText: {
+      color: colors.placeholder,
+      fontSize: 12,
+      fontWeight: "600",
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 10,
+      overflow: "hidden",
+      opacity: 0.6,
     },
   });
 

@@ -105,7 +105,7 @@ const HomeScreen = () => {
               style={styles.addButton}
               onPress={() => router.push("/newChat")}
             >
-              <AddChatIcon width={40} height={40} color={colors.iconStroke} />
+              <AddChatIcon width={25} height={25} color={colors.iconStroke} />
             </TouchableOpacity>
           </View>
 
@@ -118,7 +118,7 @@ const HomeScreen = () => {
               style={styles.searchIcon}
             />
             <TextInput
-              placeholder="Search"
+              placeholder="Search contacts"
               placeholderTextColor={colors.placeholder}
               style={styles.searchBar}
             />
@@ -183,7 +183,7 @@ const LiveChatItem = ({ friend, currentUser, onPress, getChatRoomId }) => {
 
   return (
     <ChatItem
-      name={friend.username}
+      name={friend.nickname || friend.username}
       message={lastMsg}
       time={time}
       imageUri={friend.profileImage}
@@ -211,7 +211,7 @@ const getStyles = (colors) =>
     },
     title: {
       flex: 1,
-      fontSize: 32,
+      fontSize: 24,
       fontWeight: "bold",
       color: colors.title,
       textAlign: "center",
@@ -236,7 +236,7 @@ const getStyles = (colors) =>
       backgroundColor: colors.inputBackground,
       padding: 10,
       marginTop: 20,
-      borderRadius: 16,
+      borderRadius: 8,
       marginBottom: 20,
     },
     searchBar: {

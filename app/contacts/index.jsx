@@ -34,7 +34,7 @@ const AddContactScreen = () => {
 
   const isTag = method === "tag";
   const title = isTag ? "Add by Cipher tag" : "Add by Email";
-  const placeholder = isTag ? "username" : "email@example.com";
+  const placeholder = isTag ? "Cipher tag" : "email@example.com";
   const Icon = isTag ? AtIcon : MailIcon;
 
   const handleAdd = async () => {
@@ -91,7 +91,7 @@ const AddContactScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <BackIcon width={35} height={25} color={colors.iconStroke} />
+          <BackIcon width={35} height={25} color={colors.iconFill} fill={colors.iconFill} />
         </TouchableOpacity>
         <Text style={styles.title}>{title}</Text>
       </View>
@@ -164,7 +164,7 @@ const getStyles = (colors) =>
       marginLeft: 10,
     },
     saveButton: {
-      backgroundColor: colors.button,
+      backgroundColor: "#648BCE",
       fontSize: 18,
       fontWeight: "600",
       padding: 14,
