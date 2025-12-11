@@ -2,19 +2,19 @@ import MessageBubble from "@/components/messageBubble";
 import { db } from "@/config/firebaseConfig";
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import * as ImagePicker from "expo-image-picker";
 import { uploadImage } from "@/services/imageService";
+import * as ImagePicker from "expo-image-picker";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 import {
-  doc,
-  setDoc,
   addDoc,
   collection,
+  doc,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -34,9 +34,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AttachmentIcon from "../../assets/icons/attachment.svg";
 import BackIcon from "../../assets/icons/back.svg";
 import CallIcon from "../../assets/icons/call.svg";
-import SendIcon from "../../assets/icons/send.svg";
-import SearchIcon from "../../assets/icons/search.svg";
 import CloseIcon from "../../assets/icons/close.svg";
+import SearchIcon from "../../assets/icons/search.svg";
+import SendIcon from "../../assets/icons/send.svg";
 
 const ChatScreen = () => {
   const params = useLocalSearchParams();
@@ -200,7 +200,7 @@ const ChatScreen = () => {
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
         {/* Header */}
         <View style={styles.header}>
