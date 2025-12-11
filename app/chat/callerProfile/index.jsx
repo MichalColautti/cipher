@@ -101,7 +101,20 @@ const CallerProfileScreen = () => {
             <ForwardIcon width={18} height={20} style={styles.forwardIcon} />
           </TouchableOpacity>
           <View style={styles.divider} />
-          <TouchableOpacity style={styles.settingBox}>
+          <TouchableOpacity 
+            style={styles.settingBox}
+            onPress={() => {
+              router.push({
+                pathname: "/chat",
+                params: {
+                  roomId: params.roomId,
+                  contactName: params.name,
+                  contactImage: params.image,
+                  triggerSearch: 'true'
+                }
+              });
+            }}
+          >
             <SearchIcon width={22} height={22} color={colors.iconFill} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>Search in conversation</Text>
