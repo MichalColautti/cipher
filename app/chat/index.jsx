@@ -4,6 +4,8 @@ import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
 import CryptoJS from "crypto-js";
 
+import { Platform } from "react-native";
+
 import {
   aesDecryptFromBase64,
   aesEncryptToBase64,
@@ -11,6 +13,7 @@ import {
   rsaDecryptBase64,
   rsaEncryptBase64,
 } from "@/services/cryptoService";
+import { clearCachedMessage, loadAllCachedForChat, loadCachedDecryptedMessage, saveDecryptedMessage } from "@/services/messageCache";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   addDoc,
@@ -26,7 +29,6 @@ import {
   ActivityIndicator,
   Image,
   KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -41,28 +43,24 @@ import CallIcon from "../../assets/icons/call.svg";
 import SendIcon from "../../assets/icons/send.svg";
 
 async function decryptSingleMessage(rawMsgDoc, myId, privateKeyPem, aesKeyCacheMap) {
-  // rawMsgDoc: { id, ciphertext, iv, encryptedKeys, ... }
+  console.log("Decrypting message ID:", rawMsgDoc.id);
   try {
     if (!rawMsgDoc.encryptedKeys || !rawMsgDoc.ciphertext || !rawMsgDoc.iv) {
       return { ...rawMsgDoc, text: rawMsgDoc.text ?? null };
     }
 
-    // If we already cached AES key for this message, use it
     const cached = aesKeyCacheMap.get(rawMsgDoc.id);
     let aesKeyBase64 = cached;
 
     if (!aesKeyBase64) {
-      // pick encrypted key for this user
       const encryptedKeyForMe = rawMsgDoc.encryptedKeys[myId];
       if (!encryptedKeyForMe) return { ...rawMsgDoc, text: "(cannot decrypt)" };
       if (!privateKeyPem) return { ...rawMsgDoc, text: "(cannot decrypt)" };
 
-      // RSA decrypt once, store in map
       aesKeyBase64 = await rsaDecryptBase64(encryptedKeyForMe, privateKeyPem);
       aesKeyCacheMap.set(rawMsgDoc.id, aesKeyBase64);
     }
 
-    // AES decrypt the ciphertext
     const plaintext = aesDecryptFromBase64(rawMsgDoc.ciphertext, aesKeyBase64, rawMsgDoc.iv);
     return { ...rawMsgDoc, text: plaintext };
   } catch (err) {
@@ -70,6 +68,46 @@ async function decryptSingleMessage(rawMsgDoc, myId, privateKeyPem, aesKeyCacheM
     return { ...rawMsgDoc, text: "(failed to decrypt)" };
   }
 }
+
+async function getDecryptedOrCached(raw, myId, privateKeyPem, aesKeyCacheMap, chatRoomId) {
+  try {
+    const cached = await loadCachedDecryptedMessage({
+      chatRoomId: chatRoomId,
+      messageId: raw.id,
+      ciphertext: raw.ciphertext,
+      iv: raw.iv,
+      userId: myId
+    });
+
+    let plaintext = cached ?? null;
+
+    const dec = plaintext
+      ? { ...raw, text: plaintext }
+      : await decryptSingleMessage(raw, myId, privateKeyPem, aesKeyCacheMap);  
+
+    if (!dec.text) dec.text = "(cannot decrypt)";
+
+    if (!cached && dec.text && dec.text !== "(cannot decrypt)" && dec.text !== "(failed to decrypt)") {
+      await saveDecryptedMessage({
+        chatRoomId,
+        messageId: raw.id,
+        plaintext: dec.text,
+        ciphertext: raw.ciphertext,
+        iv: raw.iv,
+        createdAtMs: raw.clientCreatedAt || raw.createdAt?.toMillis?.() || Date.now(),
+        userId: myId,
+        senderId: dec.senderId,
+      });
+    }
+
+    return dec;
+  } catch (e) {
+    console.error("getDecryptedOrCached error", e);
+    return await decryptSingleMessage(raw, myId, privateKeyPem, aesKeyCacheMap);
+  }
+}
+
+
 
 const ChatScreen = () => {
   const params = useLocalSearchParams();
@@ -79,9 +117,7 @@ const ChatScreen = () => {
   const router = useRouter();
   const [message, setMessage] = useState("");
 
-  // State to hold messages from database
   const [messages, setMessages] = useState([]);
-  // Scrollview ref, in order to scroll downwards automatically
   const scrollViewRef = useRef(null);
 
   const chatRoomId = params.roomId ? String(params.roomId) : null;
@@ -89,15 +125,20 @@ const ChatScreen = () => {
   const contactImage = params.contactImage ? String(params.contactImage) : null;
   const myId = user?.id ?? user?.uid;
 
-  // --- helpers for time normalization & sorting ---
+  const outgoingQueueRef = useRef([]); 
+  const sendingRef = useRef(false);
+
+  const messagesMapRef = useRef(new Map());       
+  const aesKeyCacheRef = useRef(new Map());       
+  const privateKeyRef = useRef(null);            
+  const pendingLocalByClientCreatedAt = useRef(new Map());
+  const shouldAutoScrollRef = useRef(false);     
+
   const toMillisFromDoc = (docObj) => {
     if (!docObj) return Date.now();
     const ts = docObj.createdAt;
-    // prefer server Timestamp
     if (ts && typeof ts.toMillis === "function") return ts.toMillis();
-    // fallback to numeric clientCreatedAt
     if (typeof docObj.clientCreatedAt === "number") return docObj.clientCreatedAt;
-    // fallback if createdAt stored as number/Date
     if (typeof ts === "number") return ts;
     if (ts && typeof ts.getTime === "function") return ts.getTime();
     return Date.now();
@@ -110,20 +151,31 @@ const ChatScreen = () => {
     if (!loading && !user) router.replace("/auth");
   }, [loading, user, router]);
 
-  // REAL TIME MESSAGE LISTENING
   useEffect(() => {
     if (!user || !chatRoomId) return;
 
-    // Refs for caches
-    const privateKeyRef = { current: null }; // we will populate below
-    const aesKeyCacheRef = { current: new Map() }; // messageId -> aesKeyBase64
-    const messagesMapRef = { current: new Map() }; // messageId -> decrypted message object
+    let unsubscribe;
 
-    // load private key once
     (async () => {
       try {
         const pk = await getPrivateKey(myId);
-        privateKeyRef.current = pk; // can be null if absent
+        privateKeyRef.current = pk;
+
+        try {
+          const cachedMap = await loadAllCachedForChat({ chatRoomId, userId: myId });
+          for (const [msgId, entry] of Object.entries(cachedMap)) {
+            messagesMapRef.current.set(msgId, {
+              id: msgId,
+              text: entry.text,
+              createdAt: { toMillis: () => entry.createdAtMs || Date.now() },
+              senderId: entry.senderId ?? null,
+            });
+          }
+          shouldAutoScrollRef.current = true;
+          setMessages(sortMessagesAsc(Array.from(messagesMapRef.current.values())));
+        } catch (cacheErr) {
+          console.warn("Failed to preload cached messages:", cacheErr);
+        }
       } catch (e) {
         console.warn("Could not load private key:", e);
       }
@@ -132,68 +184,105 @@ const ChatScreen = () => {
     const messagesRef = collection(db, "chats", chatRoomId, "messages");
     const q = query(messagesRef, orderBy("createdAt", "asc"));
 
-    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-      // Process only changed docs
-      const changes = querySnapshot.docChanges();
-      let mapChanged = false;
+    try {
+      unsubscribe = onSnapshot(
+        q,
+        async (querySnapshot) => {
+          console.log("Received", querySnapshot.docChanges().length, "message changes");
+          const changes = querySnapshot.docChanges();
+          let mapChanged = false;
 
-      // iterate changes sequentially to keep cache consistent
-      for (const change of changes) {
-        const docSnap = change.doc;
-        // Note: docSnap.data() might not contain server timestamp yet
-        const data = docSnap.data();
-        const raw = { id: docSnap.id, ...data };
+          for (const change of changes) {
+            try {
+              const docSnap = change.doc;
+              const data = docSnap.data();
+              const raw = { id: docSnap.id, ...data };
 
-        // normalize createdAt fallback: if missing, use clientCreatedAt or Date.now()
-        if (!raw.createdAt) {
-          // If there's a clientCreatedAt field, prefer that
-          if (typeof raw.clientCreatedAt === "number") {
-            raw.createdAt = { toMillis: () => raw.clientCreatedAt };
-          } else {
-            raw.createdAt = { toMillis: () => Date.now() };
+              raw.clientCreatedAt = raw.clientCreatedAt != null ? Number(raw.clientCreatedAt) : null;
+
+              if (!raw.createdAt) {
+                raw.createdAt = { toMillis: () => raw.clientCreatedAt ?? Date.now() };
+              }
+
+              if (change.type === "removed") {
+                if (messagesMapRef.current.has(raw.id)) {
+                  messagesMapRef.current.delete(raw.id);
+                  aesKeyCacheRef.current.delete(raw.id);
+                  mapChanged = true;
+                }
+                try { await clearCachedMessage(chatRoomId, raw.id); } catch (e) { console.warn(e); }
+                continue;
+              }
+
+              if (raw.senderId === myId && raw.clientCreatedAt != null) {
+                let localId = pendingLocalByClientCreatedAt.current.get(raw.clientCreatedAt);
+
+                if (!localId) {
+                  for (const [id, msg] of messagesMapRef.current.entries()) {
+                    if (msg.senderId !== myId) continue;
+                    if (msg.status !== "pending") continue;
+                    if (Number(msg.clientCreatedAt) === raw.clientCreatedAt) {
+                      localId = id;
+                      break;
+                    }
+                  }
+                }
+
+                if (localId) {
+                  console.log("Matching server message", raw.id, "to local optimistic", localId);
+                  const localMsg = messagesMapRef.current.get(localId);
+                  messagesMapRef.current.delete(localId);
+                  messagesMapRef.current.set(raw.id, {
+                    ...localMsg,
+                    id: raw.id,
+                    createdAt: raw.createdAt,
+                    status: "sent"
+                  });
+                  pendingLocalByClientCreatedAt.current.delete(raw.clientCreatedAt);
+                  mapChanged = true;
+                  continue;
+                }
+              }
+
+              const decrypted = await getDecryptedOrCached(raw, myId, privateKeyRef.current, aesKeyCacheRef.current, chatRoomId);
+              if (!decrypted.text) decrypted.text = "(cannot decrypt)";
+              messagesMapRef.current.set(raw.id, { ...decrypted, createdAt: raw.createdAt });
+              mapChanged = true;
+            } catch (changeErr) {
+              console.error("Error processing individual change:", changeErr);
+            }
           }
-        }
 
-        if (change.type === "removed") {
-          if (messagesMapRef.current.has(raw.id)) {
-            messagesMapRef.current.delete(raw.id);
-            aesKeyCacheRef.current.delete(raw.id);
-            mapChanged = true;
+          if (mapChanged) {
+            shouldAutoScrollRef.current = true;
+            setMessages(sortMessagesAsc(Array.from(messagesMapRef.current.values())));
           }
-          continue;
+        },
+        (error) => {
+          console.error("onSnapshot error:", error);
         }
+      );
+    } catch (e) {
+      console.error("Failed to set up onSnapshot:", e);
+    }
 
-        // 'added' or 'modified' -> decrypt only this doc
-        const decrypted = await decryptSingleMessage(
-          raw,
-          myId,
-          privateKeyRef.current,
-          aesKeyCacheRef.current
-        );
-
-        // update map if changed (or added)
-        const existing = messagesMapRef.current.get(raw.id);
-        const hasChanged =
-          !existing ||
-          existing.text !== decrypted.text ||
-          toMillisFromDoc(existing) !== toMillisFromDoc(raw);
-
-        if (hasChanged) {
-          // keep the original createdAt (Firestore timestamp or normalized fallback)
-          messagesMapRef.current.set(raw.id, { ...decrypted, createdAt: raw.createdAt, clientCreatedAt: raw.clientCreatedAt });
-          mapChanged = true;
-        }
-      }
-
-      if (mapChanged) {
-        // produce sorted array from map entries (ascending createdAt, with client fallback)
-        const arr = sortMessagesAsc(Array.from(messagesMapRef.current.values()));
-        setMessages(arr);
-      }
-    });
-
-    return () => unsubscribe();
+    return () => {
+      console.log("Cleaning up onSnapshot listener");
+      if (unsubscribe) unsubscribe();
+    };
   }, [user, chatRoomId, myId]);
+
+  useEffect(() => {
+    if (!shouldAutoScrollRef.current) return;
+    const t = setTimeout(() => {
+      try {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      } catch (e) {
+      }
+      shouldAutoScrollRef.current = false;
+    }, 50);
+    return () => clearTimeout(t);
+  }, [messages]);
 
   if (loading) {
     return (
@@ -210,74 +299,121 @@ const ChatScreen = () => {
 
   if (!user) return null;
 
-  // MESSAGE SENDING (now includes clientCreatedAt)
   const handleSend = async () => {
     if (!message.trim() || !chatRoomId) return;
-    try {
-      const recipientId = params.contactId;
-      if (!recipientId) return;
 
-      const userDoc = await getDoc(doc(db, "users", recipientId));
-      if (!userDoc.exists() || !userDoc.data().publicKey) return;
+    const nowMs = Date.now();
+    const trimmedMessage = message.trim();
 
-      const recipientPublicKeyPem = userDoc.data().publicKey;
+    const localMessage = {
+      id: `local_${nowMs}`,
+      text: trimmedMessage,
+      senderId: myId,
+      createdAt: { toMillis: () => nowMs },
+      clientCreatedAt: nowMs,
+      status: "pending",
+    };
 
-      const aesKeyWordArray = CryptoJS.lib.WordArray.random(32);
-      const { ciphertext, iv } = aesEncryptToBase64(message.trim(), aesKeyWordArray);
-      const aesKeyBase64 = CryptoJS.enc.Base64.stringify(aesKeyWordArray);
-      // Encrypt AES key for recipient
-      const encryptedForRecipient = await rsaEncryptBase64(aesKeyBase64, recipientPublicKeyPem);
+    messagesMapRef.current.set(localMessage.id, localMessage);
+    pendingLocalByClientCreatedAt.current.set(nowMs, localMessage.id);
+    shouldAutoScrollRef.current = true;
+    setMessages(sortMessagesAsc([...messagesMapRef.current.values()]));
+    setMessage("");
 
-      // Encrypt AES key for sender (yourself)
-      const myUserDoc = await getDoc(doc(db, "users", myId));
-      if (!myUserDoc.exists() || !myUserDoc.data().publicKey) return;
-      const myPublicKeyPem = myUserDoc.data().publicKey;
-      const encryptedForMe = await rsaEncryptBase64(aesKeyBase64, myPublicKeyPem);
+    outgoingQueueRef.current.push({ localMessage, clientCreatedAt: nowMs });
 
-      // Store both keys in Firestore
-      const messagesRef = collection(db, "chats", chatRoomId, "messages");
-
-      // client timestamp to avoid ordering glitches while server timestamp is pending
-      const nowMs = Date.now();
-
-      await addDoc(messagesRef, {
-        ciphertext,
-        encryptedKeys: {
-          [myId]: encryptedForMe,
-          [recipientId]: encryptedForRecipient
-        },
-        iv,
-        algorithm: "AES-CBC-256",
-        senderId: myId,
-        createdAt: serverTimestamp(),
-        clientCreatedAt: nowMs, // <<---- ADDED
-      });
-
-      setMessage("");
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    } catch (err) {
-      console.error("Encryption/send error:", err);
-    }
+    processQueue();
   };
 
-  // TIMESTAMP PARSING (DATABASE TIMESTAMP IS AN OBJECT or fallback)
+
+  const processQueue = async () => {
+    if (sendingRef.current) return;
+    sendingRef.current = true;
+
+    while (outgoingQueueRef.current.length > 0) {
+      const { localMessage, clientCreatedAt } = outgoingQueueRef.current[0];
+
+      try {
+        const recipientId = params.contactId;
+        if (!recipientId) throw new Error("No recipient");
+
+        const userDoc = await getDoc(doc(db, "users", recipientId));
+        if (!userDoc.exists() || !userDoc.data().publicKey) throw new Error("Recipient key missing");
+        const recipientPublicKeyPem = userDoc.data().publicKey;
+
+        const myUserDoc = await getDoc(doc(db, "users", myId));
+        if (!myUserDoc.exists() || !myUserDoc.data().publicKey) throw new Error("Sender key missing");
+        const myPublicKeyPem = myUserDoc.data().publicKey;
+
+        const aesKeyWordArray = CryptoJS.lib.WordArray.random(32);
+        const { ciphertext, iv } = aesEncryptToBase64(localMessage.text, aesKeyWordArray);
+        const aesKeyBase64 = CryptoJS.enc.Base64.stringify(aesKeyWordArray);
+
+        const encryptedForRecipient = await rsaEncryptBase64(aesKeyBase64, recipientPublicKeyPem);
+        const encryptedForMe = await rsaEncryptBase64(aesKeyBase64, myPublicKeyPem);
+
+        const messagesRef = collection(db, "chats", chatRoomId, "messages");
+
+        const payload = {
+          ciphertext,
+          encryptedKeys: { [myId]: encryptedForMe, [recipientId]: encryptedForRecipient },
+          iv,
+          algorithm: "AES-CBC-256",
+          senderId: myId,
+          createdAt: serverTimestamp(),
+          clientCreatedAt,
+        };
+
+        const docRef = await addDoc(messagesRef, payload);
+
+
+        try {
+          await saveDecryptedMessage({
+            chatRoomId,
+            messageId: docRef.id,
+            plaintext: localMessage.text,
+            ciphertext,
+            iv,
+            createdAtMs: clientCreatedAt,
+            userId: myId,
+            senderId: myId,
+          });
+        } catch (e) {
+          console.warn("Failed to save server doc to cache in processQueue:", e);
+        }
+
+        messagesMapRef.current.set(localMessage.id, { ...localMessage, status: "sent" });
+
+      } catch (err) {
+        console.error("Failed to send queued message:", err);
+        messagesMapRef.current.set(localMessage.id, { ...localMessage, status: "failed" });
+      }
+
+      outgoingQueueRef.current.shift();
+      shouldAutoScrollRef.current = true;
+      setMessages(sortMessagesAsc([...messagesMapRef.current.values()]));
+    }
+
+    sendingRef.current = false;
+  };
+
+
+
+
   const formatTime = (timestampOrNormalized) => {
-    if (!timestampOrNormalized) return "..."; // If the server has not confirmed yet
-    // If it's a Firestore Timestamp object:
+    if (!timestampOrNormalized) return "..."; 
     if (timestampOrNormalized.toDate && typeof timestampOrNormalized.toDate === "function") {
       return new Date(timestampOrNormalized.toDate()).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       });
     }
-    // If it's our normalized object with toMillis()
     if (timestampOrNormalized.toMillis && typeof timestampOrNormalized.toMillis === "function") {
       return new Date(timestampOrNormalized.toMillis()).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       });
     }
-    // If a number
     if (typeof timestampOrNormalized === "number") {
       return new Date(timestampOrNormalized).toLocaleTimeString([], {
         hour: "2-digit",
@@ -352,29 +488,35 @@ const ChatScreen = () => {
           ref={scrollViewRef}
           style={styles.chatScreen}
           contentContainerStyle={{ paddingBottom: 80 }}
-          // Scroll to the bottom whenever app loads up
           onContentSizeChange={() =>
             scrollViewRef.current?.scrollToEnd({ animated: false })
           }
-          // Scroll to the bottom when user taps
           onLayout={() =>
             scrollViewRef.current?.scrollToEnd({ animated: false })
           }
         >
           {messages.map((msg, index) => {
             const isOwn = msg.senderId === myId;
+            const isFirstInGroup = index === 0 || messages[index - 1].senderId !== msg.senderId;
 
-            // Simple logic - Is the previous message from a different person?
-            const isFirstInGroup =
-              index === 0 || messages[index - 1].senderId !== msg.senderId;
+            if (!msg.id.startsWith("local_") && msg.clientCreatedAt != null) {
+              const hasLocalVersion = messages.some(
+                m => m.id.startsWith("local_") && m.clientCreatedAt === msg.clientCreatedAt
+              );
+              if (hasLocalVersion) {
+                console.log("Skipping server duplicate:", msg.id, "local version exists");
+                return null;
+              }
+            }
 
+            console.log("Rendering message ID:", msg.id, "Text:", msg.text, "clientCreatedAt:", msg.clientCreatedAt);
+            
             return (
               <MessageBubble
                 key={msg.id}
-                text={msg.text}
-                // image={msg.image} // TODO: Add images handling
+                text={msg.text || "(loading...)"}
                 time={formatTime(msg.createdAt)}
-                isOwnMessage={isOwn}
+                isOwnMessage={msg.senderId === myId}
                 isFirstInGroup={isFirstInGroup}
               />
             );

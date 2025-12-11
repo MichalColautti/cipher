@@ -6,7 +6,6 @@ import { doc, setDoc } from "firebase/firestore";
 import forge from "node-forge";
 import { Platform } from "react-native";
 
-// On web, use localStorage fallback
 const isWeb = Platform.OS === "web";
 
 // ----------------------
@@ -56,10 +55,8 @@ export async function generateAndStoreKeypair(userId) {
   const publicKeyPem = forge.pki.publicKeyToPem(keypair.publicKey);
   const privateKeyPem = forge.pki.privateKeyToPem(keypair.privateKey);
 
-  // Store public key in Firestore
   await setDoc(doc(db, "users", userId), { publicKey: publicKeyPem }, { merge: true });
 
-  // Store private key securely
   await savePrivateKey(userId, privateKeyPem);
 
   return { publicKey: publicKeyPem };
