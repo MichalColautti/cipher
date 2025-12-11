@@ -1,5 +1,5 @@
 import { useTheme } from "@/contexts/themeContext";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const MessageBubble = ({
   text,
@@ -7,6 +7,7 @@ const MessageBubble = ({
   time,
   isOwnMessage = false,
   isFirstInGroup = true,
+  onImagePress,
 }) => {
   const { colors } = useTheme();
   const styles = getStyles(colors);
@@ -35,7 +36,13 @@ const MessageBubble = ({
         ]}
       >
         {image ? (
-          <Image source={{ uri: image }} style={[styles.image, bubbleShape]} />
+          <TouchableOpacity
+            onPress={onImagePress}
+            activeOpacity={0.9}
+            disabled={!onImagePress} // Disable if no handler provided
+          >
+            <Image source={{ uri: image }} style={[styles.image, bubbleShape]} />
+          </TouchableOpacity>
         ) : (
           <View style={[bubbleStyle, bubbleShape]}>
             <Text

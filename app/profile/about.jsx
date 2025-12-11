@@ -35,7 +35,7 @@ const AboutScreen = () => {
           <View style={styles.textContainer}>
             <Text style={styles.nameText}>Terms of Service</Text>
           </View>
-          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
 
         <View style={styles.divider} />
@@ -44,7 +44,7 @@ const AboutScreen = () => {
           <View style={styles.textContainer}>
             <Text style={styles.nameText}>Privacy Policy</Text>
           </View>
-          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
       </View>
     </View>

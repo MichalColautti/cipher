@@ -2,7 +2,21 @@ import CheckIcon from "@/assets/icons/check.svg";
 import { useTheme } from "@/contexts/themeContext";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const ColorSelector = ({ title, palette, activeColor, onSelect }) => {
+const getContrastColor = (hexColor) => {
+  if (!hexColor) return "#FFF";
+
+  const hex = hexColor.replace("#", "");
+
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+
+  return yiq >= 128 ? "#000000" : "#FFFFFF";
+};
+
+const ColorSelector = ({ title, palette, activeColor, onSelect, isBackground = false }) => {
   const { colors, theme } = useTheme();
   const styles = getStyles(colors, theme);
 
@@ -12,15 +26,18 @@ const ColorSelector = ({ title, palette, activeColor, onSelect }) => {
       <View style={styles.container}>
         <View style={styles.colorGrid}>
           {palette.map((color, index) => {
-            const isSelected =
-              (activeColor === null && index === 0) || activeColor === color;
+            const isSelected = (activeColor === null && index === 0) || activeColor === color;
+            const iconColor = (isBackground && index === 0 && theme === 'light') ? "#000000" : getContrastColor(color);
 
             return (
               <TouchableOpacity
                 key={`${color}-${index}`}
                 style={[
                   styles.colorCircle,
-                  { backgroundColor: color },
+                  { backgroundColor: color,
+                    borderWidth: 2,
+                    borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.05)'
+                  },
                 ]}
                 onPress={() => onSelect(index === 0 ? null : color)}
                 activeOpacity={0.7}
@@ -29,7 +46,7 @@ const ColorSelector = ({ title, palette, activeColor, onSelect }) => {
                   <CheckIcon
                     width={24}
                     height={24}
-                    color={"#fff"}
+                    color={iconColor}
                     style={styles.checkIcon}
                   />
                 )}

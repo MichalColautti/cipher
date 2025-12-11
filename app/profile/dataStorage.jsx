@@ -109,7 +109,7 @@ const DataStorageScreen = () => {
           <View style={styles.rightOptionSection}>
             <Text style={styles.optionValueText}>{wifiDownload}</Text>
             <ForwardIcon
-              style={{ opacity: 0.29, marginLeft: 5 }}
+              style={{ opacity: 0.4, marginLeft: 5 }}
               width={18}
               height={24}
             />
@@ -129,7 +129,7 @@ const DataStorageScreen = () => {
           <View style={styles.rightOptionSection}>
             <Text style={styles.optionValueText}>{cellularDownload}</Text>
             <ForwardIcon
-              style={{ opacity: 0.29, marginLeft: 5 }}
+              style={{ opacity: 0.4, marginLeft: 5 }}
               width={18}
               height={24}
             />

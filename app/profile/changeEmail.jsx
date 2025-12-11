@@ -121,7 +121,7 @@ const getStyles = (colors, theme) =>
       paddingVertical: 15,
     },
     saveButton: {
-      backgroundColor: colors.button,
+      backgroundColor: "#648BCE",
       padding: 15,
       borderRadius: 8,
       alignItems: "center",

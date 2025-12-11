@@ -5,6 +5,7 @@ import { useTheme } from "@/contexts/themeContext";
 import { uploadImage } from "@/services/imageService";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import ImageViewing from "react-native-image-viewing";
 
 import {
   addDoc,
@@ -47,6 +48,9 @@ const ChatScreen = () => {
 
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+
+  const [isViewerVisible, setIsViewerVisible] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const [isUploading, setIsUploading] = useState(false);
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -111,6 +115,20 @@ const ChatScreen = () => {
 
     return () => unsubscribe();
   }, [chatRoomId, myId]);
+
+  const chatImages = messages
+    .filter((msg) => msg.image)
+    .map((msg) => ({ uri: msg.image }));
+
+  // Function to open image viewer on concrete image
+  const openImageGallery = (imageUrl) => {
+    // Look for index of the image
+    const index = chatImages.findIndex((img) => img.uri === imageUrl);
+    if (index >= 0) {
+      setCurrentImageIndex(index);
+      setIsViewerVisible(true);
+    }
+  };
 
   if (loading) {
     return (
@@ -343,6 +361,7 @@ const ChatScreen = () => {
                     time={formatTime(msg.createdAt)}
                     isOwnMessage={isOwn}
                     isFirstInGroup={isFirstInGroup}
+                    onImagePress={() => msg.image && openImageGallery(msg.image)}
                   />
                 </View>
               </View>
@@ -375,6 +394,20 @@ const ChatScreen = () => {
           </View>
         )}
       </KeyboardAvoidingView>
+
+      <ImageViewing
+        images={chatImages}
+        imageIndex={currentImageIndex}
+        visible={isViewerVisible}
+        onRequestClose={() => setIsViewerVisible(false)}
+        FooterComponent={({ imageIndex }) => (
+          <View style={{ padding: 20, alignItems: "center" }}>
+            <Text style={{ color: "#FFF", fontSize: 16 }}>
+              {imageIndex + 1} / {chatImages.length}
+            </Text>
+          </View>
+        )}
+      />
     </SafeAreaView>
   );
 };

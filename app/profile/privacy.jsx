@@ -59,7 +59,7 @@ const PrivacyScreen = () => {
       <View style={styles.settingsContainer}>
         <TouchableOpacity style={styles.settingBox} onPress={() => { /* Navigate to blocked users screen */ }}>
           <Text style={styles.nameText}>Blocked Users</Text>
-          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
       </View>
 
@@ -77,7 +77,7 @@ const PrivacyScreen = () => {
         </View>
       </View>
       <Text style={styles.descriptionText}>
-        Show message text in notifications on the lock screen.
+        Show message content in notifications on the lock screen.
       </Text>
     </View>
   );
@@ -95,7 +95,7 @@ const getStyles = (colors, theme) =>
       marginTop: 30,
       flexDirection: "row",
       justifyContent: "space-between",
-      marginBottom: 10,
+      marginBottom: 30,
     },
     title: {
       fontSize: 24,

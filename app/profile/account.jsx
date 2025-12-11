@@ -75,7 +75,7 @@ const AccountScreen = () => {
       <View style={styles.settingsContainer}>
         <TouchableOpacity style={styles.settingBox} onPress={handleChangeEmail}>
           <Text style={styles.nameText}>Change email</Text>
-          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
       </View>
 

@@ -24,7 +24,7 @@ const HelpScreen = () => {
           <View style={styles.textContainer}>
             <Text style={styles.nameText}>FAQ</Text>
           </View>
-          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
 
         <View style={styles.divider} />
@@ -33,7 +33,7 @@ const HelpScreen = () => {
           <View style={styles.textContainer}>
             <Text style={styles.nameText}>Contact Support</Text>
           </View>
-          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
       </View>
     </View>

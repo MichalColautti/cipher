@@ -80,7 +80,7 @@ const AuthScreen = () => {
           <View style={styles.form}>
             <TextInput
               style={styles.input}
-              placeholder="Username"
+              placeholder="Cipher tag"
               placeholderTextColor="#aaa"
               value={username}
               onChangeText={setUsername}
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
   button: {
     padding: 15,
-    backgroundColor: "#007bff",
+    backgroundColor: "#648BCE",
     borderRadius: 5,
     marginTop: 10,
     marginHorizontal: 20,
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   switchText: {
-    color: "#007bff",
+    color: "#648BCE",
     fontWeight: "bold",
   },
   input: {

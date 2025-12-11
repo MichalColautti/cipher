@@ -1,5 +1,7 @@
 import BackIcon from "@/assets/icons/back.svg";
 import CheckIcon from "@/assets/icons/check.svg";
+import MoonIcon from "@/assets/icons/moon.svg";
+import SunIcon from "@/assets/icons/sun.svg";
 import ColorSelector from "@/components/colorSelector";
 import {
   darkThemeColors,
@@ -74,12 +76,18 @@ const AppearanceScreen = () => {
         <Text style={styles.sectionTitle}>App Theme</Text>
         <View style={styles.settingsContainer}>
           <TouchableOpacity style={styles.settingBox} onPress={() => toggleTheme("light")}>
-            <Text style={styles.nameText}>Light</Text>
+            <View style={styles.leftOptionSection}>
+              <SunIcon width={24} height={24} color={colors.iconFill} fill={colors.iconFill} />
+              <Text style={styles.nameText}>Light</Text>
+            </View>
             {theme === "light" && <CheckIcon width={24} height={24} color={colors.iconFill} />}
           </TouchableOpacity>
           <View style={styles.divider} />
           <TouchableOpacity style={styles.settingBox} onPress={() => toggleTheme("dark")}>
-            <Text style={styles.nameText}>Dark</Text>
+            <View style={styles.leftOptionSection}>
+              <MoonIcon width={24} height={24} color={colors.iconFill} fill={colors.iconFill} />
+              <Text style={styles.nameText}>Dark</Text>
+            </View>
             {theme === "dark" && <CheckIcon width={24} height={24} color={colors.iconFill} />}
           </TouchableOpacity>
         </View>
@@ -106,6 +114,7 @@ const AppearanceScreen = () => {
           palette={chatBackgroundColors}
           activeColor={customChatBackgroundColor}
           onSelect={changeChatBackgroundColor}
+          isBackground={true}
         />
 
       </ScrollView>
