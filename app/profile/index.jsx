@@ -11,11 +11,18 @@ import PrivacyIcon from "@/assets/icons/privacy.svg";
 import { useAuth } from "@/contexts/authContext";
 import { useTheme } from "@/contexts/themeContext";
 import { useRouter } from "expo-router";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const ProfileScreen = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { theme, colors } = useTheme();
   const styles = getStyles(colors, theme);
 
@@ -37,142 +44,174 @@ const ProfileScreen = () => {
         </TouchableOpacity>
         <Text style={styles.title}>Settings</Text>
       </View>
-      {/* settings options */}
-      <View style={styles.settingsContainer}>
-        <TouchableOpacity
-          style={styles.settingBox}
-          onPress={() => {
-            router.push("/profile/profileSettings");
-          }}
-        >
-          <View style={styles.leftOptionSection}>
-            {user?.profileImage ? (
-              <Image
-                source={{ uri: user.profileImage }}
-                style={styles.profileImg}
-              />
-            ) : (
-              <View
-                style={[
-                  styles.profileImg,
-                  { justifyContent: "center", alignItems: "center" },
-                ]}
-              >
-                <Text style={styles.avatarText}>
-                  {user?.username?.charAt(0).toUpperCase()}
-                </Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* settings options */}
+        <View style={styles.settingsContainer}>
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() => {
+              router.push("/profile/profileSettings");
+            }}
+          >
+            <View style={styles.leftOptionSection}>
+              {user?.profileImage ? (
+                <Image
+                  source={{ uri: user.profileImage }}
+                  style={styles.profileImg}
+                />
+              ) : (
+                <View style={[styles.profileImg, { justifyContent: "center", alignItems: "center" }]}>
+                  <Text style={styles.avatarText}>{user?.username?.charAt(0).toUpperCase()}</Text>
+                </View>
+              )}
+              
+              <View style={styles.textContainer}>
+                <Text style={styles.nameText}>{user?.nickname || user?.username}</Text>
+                <Text style={styles.atText}>@{user?.username}</Text>
               </View>
-            )}
-            <View style={styles.textContainer}>
-              <Text style={styles.nameText}>{user?.nickname || user?.username}</Text>
-              <Text style={styles.atText}>@{user?.username}</Text>
             </View>
-          </View>
+            <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.settingsContainer}>
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() => router.push("/profile/account")}
+          >
+            <View style={styles.leftOptionSection}>
+              <AccountIcon width={24} height={24} color={colors.iconFill} />
+              <View style={styles.textContainer}>
+                <Text style={styles.nameText}>Account</Text>
+              </View>
+            </View>
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+        </TouchableOpacity>
+
+          <View style={styles.divider} />
+
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() => {
+              router.push("/profile/linkedDevices");
+            }}
+          >
+            <View style={styles.leftOptionSection}>
+              <LinkedDevicesIcon
+                width={24}
+                height={24}
+                color={colors.iconFill}
+              />
+              <View style={styles.textContainer}>
+                <Text style={styles.nameText}>Linked devices</Text>
+              </View>
+            </View>
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+        </TouchableOpacity>
+
+          <View style={styles.divider} />
+
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() => router.push("/profile/privacy")}
+          >
+            <View style={styles.leftOptionSection}>
+              <PrivacyIcon width={24} height={24} color={colors.iconFill} />
+              <View style={styles.textContainer}>
+                <Text style={styles.nameText}>Privacy</Text>
+              </View>
+            </View>
           <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingBox}>
-          <View style={styles.leftOptionSection}>
-            <AccountIcon width={24} height={24} color={colors.iconFill} />
-            <View style={styles.textContainer}>
-              <Text style={styles.nameText}>Account</Text>
+        <View style={styles.settingsContainer}>
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() => router.push("/profile/profileSettings/appearance")}
+          >
+            <View style={styles.leftOptionSection}>
+              <AppearanceIcon width={24} height={24} color={colors.iconFill} />
+              <View style={styles.textContainer}>
+                <Text style={styles.nameText}>Appearance</Text>
+              </View>
             </View>
-          </View>
           <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
 
-        <View style={styles.divider} />
+          <View style={styles.divider} />
 
-        <TouchableOpacity style={styles.settingBox}>
-          <View style={styles.leftOptionSection}>
-            <LinkedDevicesIcon width={24} height={24} color={colors.iconFill} />
-            <View style={styles.textContainer}>
-              <Text style={styles.nameText}>Linked devices</Text>
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() =>
+              router.push("/profile/profileSettings/notifications")
+            }
+          >
+            <View style={styles.leftOptionSection}>
+              <NotificationsIcon
+                width={24}
+                height={24}
+                color={colors.iconFill}
+              />
+              <View style={styles.textContainer}>
+                <Text style={styles.nameText}>Notifications</Text>
+              </View>
             </View>
-          </View>
           <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
 
-        <View style={styles.divider} />
+          <View style={styles.divider} />
 
-        <TouchableOpacity style={styles.settingBox}>
-          <View style={styles.leftOptionSection}>
-            <PrivacyIcon width={24} height={24} color={colors.iconFill} />
-            <View style={styles.textContainer}>
-              <Text style={styles.nameText}>Privacy</Text>
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() => router.push("/profile/dataStorage")}
+          >
+            <View style={styles.leftOptionSection}>
+              <DataIcon width={24} height={24} color={colors.iconFill} />
+              <View style={styles.textContainer}>
+                <Text style={styles.nameText}>Data and Storage</Text>
+              </View>
             </View>
-          </View>
-          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.settingsContainer}>
-        <TouchableOpacity
-          style={styles.settingBox}
-          onPress={() => router.push("/profile/profileSettings/appearance")}
-        >
-          <View style={styles.leftOptionSection}>
-            <AppearanceIcon width={24} height={24} color={colors.iconFill} />
-            <View style={styles.textContainer}>
-              <Text style={styles.nameText}>Appearance</Text>
-            </View>
-          </View>
-          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
-        </TouchableOpacity>
-
-        <View style={styles.divider} />
-
-        <TouchableOpacity
-          style={styles.settingBox}
-          onPress={() => router.push("/profile/profileSettings/notifications")}
-        >
-          <View style={styles.leftOptionSection}>
-            <NotificationsIcon width={24} height={24} color={colors.iconFill} />
-            <View style={styles.textContainer}>
-              <Text style={styles.nameText}>Notifications</Text>
-            </View>
-          </View>
-          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
-        </TouchableOpacity>
-
-        <View style={styles.divider} />
-
-        <TouchableOpacity style={styles.settingBox}>
-          <View style={styles.leftOptionSection}>
-            <DataIcon width={24} height={24} color={colors.iconFill} />
-            <View style={styles.textContainer}>
-              <Text style={styles.nameText}>Data and Storage</Text>
-            </View>
-          </View>
           <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.settingsContainer}>
-        <TouchableOpacity style={styles.settingBox}>
-          <View style={styles.leftOptionSection}>
-            <HelptIcon width={24} height={24} color={colors.iconFill} />
-            <View style={styles.textContainer}>
-              <Text style={styles.nameText}>Help</Text>
+        <View style={styles.settingsContainer}>
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() => router.push("/profile/help")}
+          >
+            <View style={styles.leftOptionSection}>
+              <HelptIcon width={24} height={24} color={colors.iconFill} />
+              <View style={styles.textContainer}>
+                <Text style={styles.nameText}>Help</Text>
+              </View>
             </View>
-          </View>
           <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
 
-        <View style={styles.divider} />
+          <View style={styles.divider} />
 
-        <TouchableOpacity style={styles.settingBox}>
-          <View style={styles.leftOptionSection}>
-            <AboutIcon width={24} height={24} color={colors.iconFill} />
-            <View style={styles.textContainer}>
-              <Text style={styles.nameText}>About</Text>
+          <TouchableOpacity
+            style={styles.settingBox}
+            onPress={() => router.push("/profile/about")}
+          >
+            <View style={styles.leftOptionSection}>
+              <AboutIcon width={24} height={24} color={colors.iconFill} />
+              <View style={styles.textContainer}>
+                <Text style={styles.nameText}>About</Text>
+              </View>
             </View>
-          </View>
-          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
-        </TouchableOpacity>
-      </View>
+            <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.settingsContainer}>
+          <TouchableOpacity style={styles.settingBox} onPress={logout}>
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -260,6 +299,13 @@ const getStyles = (colors, theme) =>
       height: 1,
       backgroundColor: colors.divider,
       marginLeft: 54,
+    },
+    logoutText: {
+      color: "#E53935",
+      fontSize: 18,
+      fontWeight: "600",
+      textAlign: "center",
+      flex: 1,
     },
   });
 

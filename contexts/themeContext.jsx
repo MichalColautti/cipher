@@ -17,6 +17,7 @@ export const darkThemeColors = {
   incomingBubble: "#383D42",
   outgoingBubbleText: "#fff",
   incomingBubbleText: "#fff",
+  chatBackground: "#212427",
 };
 
 export const lightThemeColors = {
@@ -35,12 +36,18 @@ export const lightThemeColors = {
   incomingBubble: "#212427",
   outgoingBubbleText: "#fff",
   incomingBubbleText: "#fff",
+  chatBackground: "#fff",
 };
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState("dark");
+  const [customOutgoingBubbleColor, setCustomOutgoingBubbleColor] =
+    useState(null);
+  const [customIncomingBubbleColor, setCustomIncomingBubbleColor] =
+    useState(null);
+  const [customChatBackgroundColor, setCustomChatBackgroundColor] = useState(null);
 
   useEffect(() => {
     const loadTheme = async () => {
@@ -48,6 +55,27 @@ export const ThemeProvider = ({ children }) => {
         const savedTheme = await AsyncStorage.getItem("appTheme");
         if (savedTheme) {
           setTheme(savedTheme);
+        }
+
+        const savedOutgoingColor = await AsyncStorage.getItem(
+          "appOutgoingColor"
+        );
+        if (savedOutgoingColor) {
+          setCustomOutgoingBubbleColor(savedOutgoingColor);
+        }
+
+        const savedIncomingColor = await AsyncStorage.getItem(
+          "appIncomingColor"
+        );
+        if (savedIncomingColor) {
+          setCustomIncomingBubbleColor(savedIncomingColor);
+        }
+
+        const savedBackgroundColor = await AsyncStorage.getItem(
+          "appBackgroundColor"
+        );
+        if (savedBackgroundColor) {
+          setCustomChatBackgroundColor(savedBackgroundColor);
         }
       } catch (error) {
         console.error("Failed to load theme from storage", error);
@@ -66,10 +94,59 @@ export const ThemeProvider = ({ children }) => {
     }
   };
 
-  const colors = theme === "light" ? lightThemeColors : darkThemeColors;
+  const changeOutgoingBubbleColor = async (color) => {
+    try {
+      if (color === null) await AsyncStorage.removeItem("appOutgoingColor");
+      else await AsyncStorage.setItem("appOutgoingColor", color);
+      setCustomOutgoingBubbleColor(color);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const changeIncomingBubbleColor = async (color) => {
+    try {
+      if (color === null) await AsyncStorage.removeItem("appIncomingColor");
+      else await AsyncStorage.setItem("appIncomingColor", color);
+      setCustomIncomingBubbleColor(color);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const changeChatBackgroundColor = async (color) => {
+    try {
+      if (color === null) await AsyncStorage.removeItem("appBackgroundColor");
+      else await AsyncStorage.setItem("appBackgroundColor", color);
+      setCustomChatBackgroundColor(color);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const baseColors = theme === "light" ? lightThemeColors : darkThemeColors;
+
+  const colors = {
+    ...baseColors,
+    outgoingBubble: customOutgoingBubbleColor || baseColors.outgoingBubble,
+    incomingBubble: customIncomingBubbleColor || baseColors.incomingBubble,
+    chatBackground: customChatBackgroundColor || baseColors.chatBackground,
+  };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, colors }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        toggleTheme,
+        colors,
+        changeOutgoingBubbleColor,
+        customOutgoingBubbleColor,
+        changeIncomingBubbleColor,
+        customIncomingBubbleColor,
+        changeChatBackgroundColor,
+        customChatBackgroundColor,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

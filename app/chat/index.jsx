@@ -387,8 +387,8 @@ const getStyles = (colors) =>
     },
     chatScreen: {
       flex: 1,
-      backgroundColor: colors.background,
-      paddingHorizontal: 0,
+      backgroundColor: colors.chatBackground,
+      paddingHorizontal: 10,
     },
     header: {
       alignItems: "center",
