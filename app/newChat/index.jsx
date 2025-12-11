@@ -11,16 +11,15 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    SectionList,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Image,
+  SectionList,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const getChatRoomId = (user1, user2) => {
   const sortedIds = [user1, user2].sort();
@@ -62,12 +61,16 @@ const NewChatScreen = () => {
     const myId = user.id || user.uid;
     const roomId = getChatRoomId(myId, otherUser.id);
 
+    const displayName = otherUser.nickname || otherUser.username;
+
     router.push({
       pathname: "/chat",
       params: {
         roomId: roomId,
-        contactName: otherUser.username,
+        contactName: displayName,
         contactImage: otherUser.profileImage,
+        username: otherUser.username,
+        nickname: otherUser.nickname,
       },
     });
   };
@@ -82,18 +85,28 @@ const NewChatScreen = () => {
 
   // Function to group and filter friends by search text
   const sections = useMemo(() => {
-    const filtered = friends.filter((u) =>
-      u.username?.toLowerCase().includes(searchText.toLowerCase())
-    );
+    // Helper to extract display name
+    const getDisplayName = (u) => u.nickname || u.username;
 
-    // Sort alphabetically
+    const filtered = friends.filter((u) => {
+      const searchLower = searchText.toLowerCase();
+      const displayLower = getDisplayName(u).toLowerCase();
+      const usernameLower = u.username?.toLowerCase() || "";
+
+      // Look in both DISPLAY NAME and USERNAME
+      return displayLower.includes(searchLower) || usernameLower.includes(searchLower);
+    });
+
+    // Sort alphabetically by DISPLAY NAME
     const sorted = filtered.sort((a, b) =>
-      a.username.localeCompare(b.username)
+      getDisplayName(a).localeCompare(getDisplayName(b))
     );
 
-    // Group by first letter
+    // Group by first letter of DISPLAY NAME
     const grouped = sorted.reduce((acc, user) => {
-      const firstLetter = user.username.charAt(0).toUpperCase();
+      const name = getDisplayName(user);
+      const firstLetter = name.charAt(0).toUpperCase();
+
       if (!acc[firstLetter]) {
         acc[firstLetter] = [];
       }
@@ -107,39 +120,37 @@ const NewChatScreen = () => {
     }));
   }, [friends, searchText]);
 
-  const renderUserItem = ({ item }) => (
-    <TouchableOpacity
-      style={[styles.userItem, { backgroundColor: colors.settingsBackground }]}
-      onPress={() => openChat(item)}
-    >
-      {item.profileImage ? (
-        <Image source={{ uri: item.profileImage }} style={styles.avatar} />
-      ) : (
-        <View style={[styles.avatar, { backgroundColor: colors.button }]}>
-          <Text style={styles.avatarText}>
-            {item.username?.charAt(0).toUpperCase()}
-          </Text>
-        </View>
-      )}
-      <Text style={[styles.userName, { color: colors.text }]}>
-        {item.username}
-      </Text>
-    </TouchableOpacity>
-  );
+  const renderUserItem = ({ item }) => {
+    const displayName = item.nickname || item.username;
+
+    return (
+      <TouchableOpacity
+        style={[styles.userItem, { backgroundColor: colors.settingsBackground }]}
+        onPress={() => openChat(item)}
+      >
+        {item.profileImage ? (
+          <Image source={{ uri: item.profileImage }} style={styles.avatar} />
+        ) : (
+          <View style={[styles.avatar, { backgroundColor: colors.button }]}>
+            <Text style={styles.avatarText}>
+              {displayName?.charAt(0).toUpperCase()}
+            </Text>
+          </View>
+        )}
+
+        <Text style={[styles.userName, { color: colors.text }]}>
+          {displayName}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <BackIcon
-            width={35}
-            height={25}
-            color={colors.iconFill}
-            fill={colors.iconFill}
-          />
+          <BackIcon width={35} height={25} color={colors.iconFill} fill={colors.iconFill} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.title }]}>
           New message
@@ -180,7 +191,7 @@ const NewChatScreen = () => {
           label="New groupchat"
           IconComponent={GroupIcon}
           colors={colors}
-          onPress={() => {}}
+          onPress={() => { }}
           styles={styles}
         />
         <ActionItem
@@ -230,7 +241,7 @@ const NewChatScreen = () => {
           }
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -259,7 +270,8 @@ const getStyles = (colors, theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      padding: 20,
+      backgroundColor: colors.background,
+      padding: 22,
     },
     header: {
       flexDirection: "row",
@@ -269,7 +281,7 @@ const getStyles = (colors, theme) =>
     },
     headerTitle: {
       flex: 1,
-      fontSize: 32,
+      fontSize: 24,
       fontWeight: "bold",
       color: colors.title,
       textAlign: "center",
@@ -280,24 +292,22 @@ const getStyles = (colors, theme) =>
     searchContainer: {
       flexDirection: "row",
       alignItems: "center",
-      marginHorizontal: 16,
+      backgroundColor: colors.inputBackground,
+      padding: 10,
       borderRadius: 8,
-      paddingHorizontal: 12,
-      height: 45,
-      marginTop: 10,
+      marginTop: 20,
       marginBottom: 20,
     },
     searchIcon: {
-      opacity: 0.5,
-      marginRight: 10,
+      opacity: 0.7,
     },
     searchInput: {
       flex: 1,
-      fontSize: 16,
+      marginLeft: 10,
+      color: colors.text,
     },
     actionsContainer: {
       borderRadius: 8,
-      marginHorizontal: 16,
       marginBottom: 20,
       ...(theme === "light" && {
         borderWidth: 1,
@@ -337,13 +347,13 @@ const getStyles = (colors, theme) =>
     sectionHeader: {
       fontSize: 14,
       fontWeight: "bold",
-      marginLeft: 20,
+      marginLeft: 0,
       marginBottom: 10,
     },
     letterHeader: {
       fontSize: 14,
       fontWeight: "bold",
-      marginLeft: 20,
+      marginLeft: 5,
       marginTop: 10,
       marginBottom: 5,
     },
@@ -352,7 +362,6 @@ const getStyles = (colors, theme) =>
       alignItems: "center",
       paddingVertical: 12,
       paddingHorizontal: 16,
-      marginHorizontal: 16,
       marginBottom: 8,
       ...(theme === "light" && {
         borderWidth: 1,

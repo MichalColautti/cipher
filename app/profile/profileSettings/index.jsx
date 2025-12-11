@@ -43,7 +43,7 @@ const ProfileSettingsScreen = () => {
         const cloudUrl = await uploadImage(localUri);
 
         if (!cloudUrl) {
-          throw new Error("Nie udało się załadować zdjęcia.");
+          throw new Error("Could not load the photo.");
         }
 
         const db = getFirestore();
@@ -56,11 +56,11 @@ const ProfileSettingsScreen = () => {
           updateUserContext({ ...user, profileImage: cloudUrl });
         }
 
-        Alert.alert("Sukces", "Zdjęcie profilowe zostało zmienione.");
+        Alert.alert("Success", "Profile picture has been changed.");
       }
     } catch (error) {
       console.error(error);
-      Alert.alert("Błąd", "Wystąpił problem podczas zmiany zdjęcia.");
+      Alert.alert("Error", "An error ocurred while changing the profile picture.");
     } finally {
       setLoading(false);
     }
@@ -121,7 +121,7 @@ const ProfileSettingsScreen = () => {
           disabled={loading}
         >
           <Text style={styles.editPhotoBtnText}>
-            {loading ? "Wysyłanie..." : "Edytuj zdjęcie"}
+            {loading ? "Uploading..." : "Edit photo"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -131,10 +131,10 @@ const ProfileSettingsScreen = () => {
           <View style={styles.leftOptionSection}>
             <AccountIcon width={24} height={24} color={colors.iconFill} />
             <View style={styles.textContainer}>
-              <Text style={styles.nameText}>{user.username}</Text>
+              <Text style={styles.nameText}>{user?.nickname || "Displayed name"}</Text>
             </View>
           </View>
-          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
 
         <View style={styles.divider} />
@@ -143,16 +143,16 @@ const ProfileSettingsScreen = () => {
           <View style={styles.leftOptionSection}>
             <EditIcon width={24} height={24} color={colors.iconFill} />
             <View style={styles.textContainer}>
-              <Text style={styles.nameText}>O mnie</Text>
+              <Text style={styles.nameText}>Your bio</Text>
             </View>
           </View>
-          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
       </View>
 
       <Text style={styles.subText}>
-        Twój profil oraz wprowadzane w nim zmiany są widoczne dla osób, z
-        którymi wymieniasz wiadomości, a także Twoich kontaktów i grup.
+        Your profile and any changes you make to it are visible to people you
+        message, as well as your contacts and groups.
       </Text>
 
       <View style={styles.settingsContainer}>
@@ -168,16 +168,15 @@ const ProfileSettingsScreen = () => {
           <View style={styles.leftOptionSection}>
             <AtIcon width={18} height={18} color={colors.iconFill} />
             <View style={styles.textContainer}>
-              <Text style={styles.nameText}>Nazwa użytkownika</Text>
+              <Text style={styles.nameText}>Cipher tag</Text>
             </View>
           </View>
-          <ForwardIcon style={{ opacity: 0.29 }} width={18} height={24} />
+          <ForwardIcon style={{ opacity: 0.4 }} width={18} height={24} />
         </TouchableOpacity>
       </View>
 
       <Text style={styles.subText}>
-        Inne osoby mogą teraz wysyłać Ci wiadomości za pomocą Twojej opcjonalnej
-        nazwy użytkownika.
+        Other people can now message you using your cipher tag.
       </Text>
     </View>
   );
@@ -195,11 +194,11 @@ const getStyles = (colors, theme) =>
       marginTop: 30,
       flexDirection: "row",
       justifyContent: "space-between",
-      marginBottom: 18,
+      marginBottom: 28,
     },
     title: {
       flex: 1,
-      fontSize: 32,
+      fontSize: 24,
       fontWeight: "bold",
       color: colors.title,
       textAlign: "center",
@@ -286,7 +285,7 @@ const getStyles = (colors, theme) =>
     subText: {
       color: colors.placeholder,
       fontSize: 13,
-      paddingHorizontal: 26,
+      paddingHorizontal: 15,
       marginVertical: 15,
       lineHeight: 17,
       textAlign: "left",

@@ -82,7 +82,7 @@ const getStyles = (colors, theme) =>
     },
     title: {
       flex: 1,
-      fontSize: 32,
+      fontSize: 24,
       fontWeight: "bold",
       color: colors.title,
       textAlign: "center",

@@ -6,6 +6,9 @@ import {
   lightThemeColors,
   useTheme,
 } from "@/contexts/themeContext";
+import MoonIcon from "@/assets/icons/moon.svg";
+import SunIcon from "@/assets/icons/sun.svg";
+
 import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -163,6 +166,11 @@ const getStyles = (colors, theme) =>
       alignItems: "center",
       justifyContent: "space-between",
     },
+    leftOptionSection: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 15,
+    },
     nameText: {
       color: colors.text,
       fontSize: 18,
@@ -171,7 +179,7 @@ const getStyles = (colors, theme) =>
     divider: {
       height: 1,
       backgroundColor: colors.divider,
-      marginLeft: 15,
+      marginLeft: 54,
     },
     colorGrid: {
       flexDirection: "row",
