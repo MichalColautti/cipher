@@ -59,13 +59,17 @@ const HomeScreen = () => {
     const myId = user.id || user.uid;
     const roomId = getChatRoomId(myId, otherUser.id);
 
+    const displayName = otherUser.nickname || otherUser.username;
+
     router.push({
       pathname: "/chat",
       params: {
         roomId,
-        contactId: otherUser.id, 
-        contactName: otherUser.username,
+        contactId: otherUser.id,
+        contactName: displayName,
         contactImage: otherUser.profileImage,
+        username: otherUser.username,
+        nickname: otherUser.nickname,
       },
     });
   };
