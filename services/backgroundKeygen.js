@@ -1,50 +1,55 @@
-import { db } from "@/config/firebaseConfig";
-import { generateAndStoreKeypair, savePrivateKey } from "@/services/cryptoService";
-import { doc, setDoc } from "firebase/firestore";
+import { NativeModules } from "react-native";
 
 
-export async function runBackgroundKeygen(userId) {
+export async function runBackgroundKeygen(userId, options = { allowFallback: true }) {
   if (!userId) return { success: false, error: "missing-userId" };
 
+  let canUseNativeWorker = false;
   try {
-    const rnmt = await import("react-native-multithreading");
+    const nativeRegistry = NativeModules && NativeModules.ReactNativeMultithreading;
+    if (nativeRegistry) canUseNativeWorker = true;
+  } catch (e) {
+    canUseNativeWorker = false;
+  }
 
-    const spawnThread = rnmt && rnmt.spawnThread ? rnmt.spawnThread : null;
-    if (!spawnThread) {
-      throw new Error("spawnThread-not-available");
-    }
-
-    const runWorker = spawnThread(() => require("../workers/crypto.worker.js"));
-    const result = await runWorker(userId); 
-
-    if (!result || !result.publicKeyPem || !result.privateKeyPem) {
-      throw new Error("invalid-worker-result");
-    }
-
-    const { publicKeyPem, privateKeyPem } = result;
-
-    await savePrivateKey(userId, privateKeyPem);
-
-    await setDoc(doc(db, "users", userId), { publicKey: publicKeyPem }, { merge: true });
-
-    return { success: true, publicKey: publicKeyPem };
-  } catch (err) {
-    console.warn("Background keygen worker unavailable or failed:", err?.message || err);
-
+  if (canUseNativeWorker) {
     try {
-      setTimeout(async () => {
+      const rnmt = require("react-native-multithreading");
+      if (rnmt && typeof rnmt.spawnThread === "function") {
         try {
-          await generateAndStoreKeypair(userId); 
-          console.log("Fallback key generation (JS-thread) completed for", userId);
-        } catch (e) {
-          console.error("Fallback key generation failed:", e);
+          const runWorker = rnmt.spawnThread(() => require("../workers/crypto.worker.js"));
+          const result = await runWorker(userId);
+          if (result && result.publicKeyPem && result.privateKeyPem) {
+            return { success: true, publicKeyPem: result.publicKeyPem, privateKeyPem: result.privateKeyPem };
+          }
+          console.warn("Background keygen worker returned unexpected result, falling back");
+        } catch (workerErr) {
+          console.warn("Background keygen worker failed, falling back:", workerErr && workerErr.message ? workerErr.message : workerErr);
         }
-      }, 50);
-
-      return { success: false, error: "worker_failed_fallback_started" };
-    } catch (fallbackErr) {
-      console.error("Fallback scheduling failed:", fallbackErr);
-      return { success: false, error: fallbackErr.message || String(fallbackErr) };
+      }
+    } catch (requireErr) {
+      console.warn("react-native-multithreading require failed:", requireErr && requireErr.message ? requireErr.message : requireErr);
     }
+  } else {
+    console.warn("Native react-native-multithreading module not present — skipping native worker");
+    if (!options.allowFallback) return { success: false, error: "no_worker" };
+  }
+
+  if (!options.allowFallback) return { success: false, error: "no_worker" };
+
+  try {
+    const genFn = require("../workers/crypto.worker.js");
+    if (typeof genFn === "function") {
+      const result = await genFn(userId);
+      if (result && result.publicKeyPem && result.privateKeyPem) {
+        return { success: true, publicKeyPem: result.publicKeyPem, privateKeyPem: result.privateKeyPem };
+      }
+      return { success: false, error: "fallback_worker_no_keys" };
+    } else {
+      return { success: false, error: "worker_module_invalid" };
+    }
+  } catch (fallbackErr) {
+    console.error("Background keygen fallback (JS) failed:", fallbackErr);
+    return { success: false, error: fallbackErr && fallbackErr.message ? fallbackErr.message : String(fallbackErr) };
   }
 }
