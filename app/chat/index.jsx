@@ -141,6 +141,9 @@ const ChatScreen = () => {
   const chatRoomId = params.roomId ? String(params.roomId) : null;
   const contactName = params.contactName ? String(params.contactName) : null;
   const contactImage = params.contactImage ? String(params.contactImage) : null;
+  const paramUsername = params.username ? String(params.username) : null;
+  const paramNickname = params.nickname ? String(params.nickname) : null;
+
   const myId = user?.id ?? user?.uid;
 
   const outgoingQueueRef = useRef([]); 
@@ -150,8 +153,8 @@ const ChatScreen = () => {
   const aesKeyCacheRef = useRef(new Map());       
   const privateKeyRef = useRef(null);            
   const pendingLocalByClientCreatedAt = useRef(new Map());
-  const shouldAutoScrollRef = useRef(false);     
-
+  const shouldAutoScrollRef = useRef(false);
+  
   const toMillisFromDoc = (docObj) => {
     if (!docObj) return Date.now();
     const ts = docObj.createdAt;
@@ -601,11 +604,13 @@ const ChatScreen = () => {
                 <TouchableOpacity
                   style={styles.leftHeaderSection}
                   onPress={() => router.push({
-                    pathname: "/chat/callerProfile", params: {
-                      roomId: chatRoomId, name: otherUserProfile?.username || contactName,
+                    pathname: "/chat/callerProfile",
+                    params: {
+                      roomId: chatRoomId,
+                      name: otherUserProfile?.nickname || otherUserProfile?.username || paramNickname || paramUsername || contactName,
                       image: otherUserProfile?.profileImage || contactImage,
-                      username: otherUserProfile?.username,
-                      nickname: otherUserProfile?.nickname, 
+                      username: otherUserProfile?.username || paramUsername,
+                      nickname: otherUserProfile?.nickname || paramNickname,
                     }
                   })}
                 >
@@ -616,7 +621,10 @@ const ChatScreen = () => {
                       <Text style={styles.avatarText}>{contactName?.charAt(0).toUpperCase()}</Text>
                     </View>
                   )}
-                  <Text style={styles.title}>{otherUserProfile?.nickname || otherUserProfile?.username}</Text>
+
+                  <Text style={styles.title}>
+                    {otherUserProfile?.nickname || otherUserProfile?.username || paramNickname || paramUsername || contactName}
+                  </Text>
                 </TouchableOpacity>
               </View>
 
